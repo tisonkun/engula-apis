@@ -3,25 +3,13 @@ syntax = "proto3";
 package engula.v1;
 
 import "object/numeric.proto";
-import "object/json.proto";
 
 message TypeSpec {
-  oneof spec {
-    Int64Spec int64_spec = 1;
-    JsonSpec json_spec = 2;
-  }
+  oneof spec { Int64Spec int64_spec = 1; }
 }
 
 message Int64Spec {}
 
-message JsonSpec {}
+message TypedExpr { repeated NumericExpr numeric = 1; }
 
-message TypedExpr {
-  repeated NumericExpr numeric = 1;
-  repeated JsonExpr json = 2;
-}
-
-message TypedValue {
-  repeated NumericValue numeric = 1;
-  repeated bytes json = 2;
-}
+message TypedValue { repeated NumericValue numeric = 1; }
