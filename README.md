@@ -1,4 +1,4 @@
-# Engula Proto
+# Engula Protobuf
 
 This project contains the public protobuf definitions of Engula.
 
