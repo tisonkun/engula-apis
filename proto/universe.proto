@@ -1,0 +1,144 @@
+syntax = "proto3";
+
+package engula.v1;
+
+import "object/object.proto";
+
+service Universe {
+  rpc Databases(DatabasesRequest) returns (DatabasesResponse) {}
+
+  rpc Collections(CollectionsRequest) returns (CollectionsResponse) {}
+}
+
+message DatabasesRequest { DatabasesRequestUnion request = 1; }
+
+message DatabasesResponse { DatabasesResponseUnion response = 1; }
+
+message DatabasesRequestUnion {
+  oneof request {
+    ListDatabasesRequest list_databases = 1;
+    CreateDatabaseRequest create_database = 2;
+    UpdateDatabaseRequest update_database = 3;
+    DeleteDatabaseRequest delete_database = 4;
+    DescribeDatabaseRequest describe_database = 5;
+  }
+}
+
+message DatabasesResponseUnion {
+  oneof response {
+    ListDatabasesResponse list_databases = 1;
+    CreateDatabaseResponse create_database = 2;
+    UpdateDatabaseResponse update_database = 3;
+    DeleteDatabaseResponse delete_database = 4;
+    DescribeDatabaseResponse describe_database = 5;
+  }
+}
+
+message ListDatabasesRequest {
+  // TODO: pagination
+}
+
+message ListDatabasesResponse { repeated DatabaseDesc descs = 1; }
+
+message CreateDatabaseRequest { DatabaseSpec spec = 1; }
+
+message CreateDatabaseResponse { DatabaseDesc desc = 1; }
+
+message UpdateDatabaseRequest {
+  uint64 id = 1;
+  string name = 2;
+  DatabaseSpec spec = 3;
+}
+
+message UpdateDatabaseResponse { DatabaseDesc desc = 1; }
+
+message DeleteDatabaseRequest {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message DeleteDatabaseResponse {}
+
+message DescribeDatabaseRequest {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message DescribeDatabaseResponse { DatabaseDesc desc = 1; }
+
+message CollectionsRequest {
+  uint64 database_id = 1;
+  CollectionsRequestUnion request = 2;
+}
+
+message CollectionsResponse { CollectionsResponseUnion response = 1; }
+
+message CollectionsRequestUnion {
+  oneof request {
+    ListCollectionsRequest list_collections = 1;
+    CreateCollectionRequest create_collection = 2;
+    UpdateCollectionRequest update_collection = 3;
+    DeleteCollectionRequest delete_collection = 4;
+    DescribeCollectionRequest describe_collection = 5;
+  }
+}
+
+message CollectionsResponseUnion {
+  oneof response {
+    ListCollectionsResponse list_collections = 1;
+    CreateCollectionResponse create_collection = 2;
+    UpdateCollectionResponse update_collection = 3;
+    DeleteCollectionResponse delete_collection = 4;
+    DescribeCollectionResponse describe_collection = 5;
+  }
+}
+
+message ListCollectionsRequest {
+  // TODO: pagination
+}
+
+message ListCollectionsResponse { repeated CollectionDesc descs = 1; }
+
+message CreateCollectionRequest { CollectionSpec spec = 1; }
+
+message CreateCollectionResponse { CollectionDesc desc = 1; }
+
+message UpdateCollectionRequest {
+  uint64 id = 1;
+  string name = 2;
+  CollectionSpec spec = 3;
+}
+
+message UpdateCollectionResponse { CollectionDesc desc = 1; }
+
+message DeleteCollectionRequest {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message DeleteCollectionResponse {}
+
+message DescribeCollectionRequest {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message DescribeCollectionResponse { CollectionDesc desc = 1; }
+
+message DatabaseSpec { string name = 1; }
+
+message DatabaseDesc {
+  uint64 id = 1;
+  DatabaseSpec spec = 2;
+}
+
+message CollectionSpec {
+  string name = 1;
+  TypeSpec type_spec = 2;
+}
+
+message CollectionDesc {
+  uint64 id = 1;
+  uint64 parent_id = 2;
+  CollectionSpec spec = 3;
+}
