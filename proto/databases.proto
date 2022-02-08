@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package engula.v1;
+
+service Databases {
+  rpc Call(DatabasesRequest) returns (DatabasesResponse) {}
+}
+
+message DatabasesRequest { DatabasesRequestUnion request = 1; }
+
+message DatabasesResponse { DatabasesResponseUnion response = 1; }
+
+message DatabasesRequestUnion {
+  oneof request {
+    ListDatabasesRequest list_databases = 1;
+    CreateDatabaseRequest create_database = 2;
+    DeleteDatabaseRequest delete_database = 3;
+    DescribeDatabaseRequest describe_database = 4;
+  }
+}
+
+message DatabasesResponseUnion {
+  oneof request {
+    ListDatabasesResponse list_databases = 1;
+    CreateDatabaseResponse create_database = 2;
+    DeleteDatabaseResponse delete_database = 3;
+    DescribeDatabaseResponse describe_database = 4;
+  }
+}
+
+message ListDatabasesRequest {
+  // TODO: pagination
+}
+
+message ListDatabasesResponse { repeated DatabaseDesc descs = 1; }
+
+message CreateDatabaseRequest { DatabaseSpec spec = 1; }
+
+message CreateDatabaseResponse { DatabaseDesc desc = 1; }
+
+message DeleteDatabaseRequest { string name = 1; }
+
+message DeleteDatabaseResponse {}
+
+message DescribeDatabaseRequest { string name = 1; }
+
+message DescribeDatabaseResponse { DatabaseDesc desc = 1; }
+
+message DatabaseSpec { string name = 1; }
+
+message DatabaseDesc {
+  uint64 id = 1;
+  DatabaseSpec spec = 2;
+}

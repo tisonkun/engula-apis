@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package engula.v1;
+
+import "object/object.proto";
+
+service Collections {
+  rpc Call(CollectionsRequest) returns (CollectionsResponse) {}
+}
+
+message CollectionsRequest {
+  uint64 database_id = 1;
+  CollectionsRequestUnion request = 2;
+}
+
+message CollectionsResponse { CollectionsResponseUnion response = 1; }
+
+message CollectionsRequestUnion {
+  oneof request {
+    ListCollectionsRequest list_collections = 1;
+    CreateCollectionRequest create_collection = 2;
+    DeleteCollectionRequest delete_collection = 3;
+    DescribeCollectionRequest describe_collection = 4;
+  }
+}
+
+message CollectionsResponseUnion {
+  oneof request {
+    ListCollectionsResponse list_collections = 1;
+    CreateCollectionResponse create_collection = 2;
+    DeleteCollectionResponse delete_collection = 3;
+    DescribeCollectionResponse describe_collection = 4;
+  }
+}
+
+message ListCollectionsRequest {
+  // TODO: pagination
+}
+
+message ListCollectionsResponse { repeated CollectionDesc descs = 1; }
+
+message CreateCollectionRequest { CollectionSpec spec = 1; }
+
+message CreateCollectionResponse { CollectionDesc desc = 1; }
+
+message DeleteCollectionRequest { string name = 1; }
+
+message DeleteCollectionResponse {}
+
+message DescribeCollectionRequest { string name = 1; }
+
+message DescribeCollectionResponse { CollectionDesc desc = 1; }
+
+message CollectionSpec {
+  string name = 1;
+  TypeSpec type_spec = 2;
+}
+
+message CollectionDesc {
+  uint64 id = 1;
+  uint64 parent_id = 2;
+  CollectionSpec spec = 3;
+}

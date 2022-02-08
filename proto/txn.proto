@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package engula.v1;
+
+import "object/object.proto";
+
+service Txn {
+  rpc Call(TxnRequest) returns (TxnResponse) {}
+}
+
+message TxnRequest {
+  uint64 database_id = 1;
+  repeated uint64 collection_ids = 2;
+  repeated TypedExpr collection_exprs = 3;
+}
+
+message TxnResponse { repeated TypedValue collection_values = 1; }

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package engula.v1;
+
+import "object/base.proto";
+
+message JsonExpr { JsonCallExpr call = 1; }
+
+message JsonCallExpr {
+  oneof function {
+    GeneralFunction general = 1;
+    JsonFunction json = 2;
+  }
+  bytes argument = 15;
+}
+
+enum JsonFunction { MERGE = 0; }
