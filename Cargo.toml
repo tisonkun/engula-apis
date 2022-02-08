@@ -1,11 +1,11 @@
 [package]
-name = "engula-proto"
+name = "engula-apis"
 version = "0.3.0"
 edition = "2021"
 license = "Apache-2.0"
 homepage = "https://engula.io"
-repository = "https://github.com/engula/engula-proto"
-description = "Public protobuf definitions of Engula."
+repository = "https://github.com/engula/engula-apis"
+description = "Public interface definitions of Engula APIs."
 
 [dependencies]
 prost = "0.9"

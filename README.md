@@ -1,12 +1,12 @@
-# Engula Protobuf Definitions
+# Engula APIs
 
-This project contains the public protobuf definitions of Engula.
+This project contains the public interface definitions of Engula APIs.
 
-## Validation
+## Build
 
-The Rust crate in this project serves as a validator of the protobuf definitions.
+You can build the Rust crate in this project to validate the definitions.
 
-To validate the `.proto` files:
+To compile all `.proto` files:
 
 ```
 Cargo build
