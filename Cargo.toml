@@ -1,12 +1,15 @@
 [package]
 name = "engula-proto"
-version = "0.1.0"
+version = "0.3.0"
 edition = "2021"
-publish = false
+license = "Apache-2.0"
+homepage = "https://engula.io"
+repository = "https://github.com/engula/engula-proto"
+description = "Public protobuf definitions of Engula."
 
 [dependencies]
-tonic = "0.6"
 prost = "0.9"
+tonic = "0.6"
 
 [build-dependencies]
 tonic-build = "0.6"
