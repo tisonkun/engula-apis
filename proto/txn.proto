@@ -2,16 +2,28 @@ syntax = "proto3";
 
 package engula.v1;
 
-import "object/object.proto";
+import "object/expr.proto";
+import "object/value.proto";
 
 service Txn {
-  rpc Call(TxnRequest) returns (TxnResponse) {}
+  rpc Read(TxnRequest) returns (TxnResponse) {}
+  rpc Write(TxnRequest) returns (TxnResponse) {}
 }
 
-message TxnRequest {
+message TxnRequest { repeated DatabaseTxnRequest requests = 1; }
+
+message TxnResponse { repeated DatabaseTxnResponse responses = 1; }
+
+message DatabaseTxnRequest {
   uint64 database_id = 1;
-  repeated uint64 collection_ids = 2;
-  repeated TypedExpr collection_exprs = 3;
+  repeated CollectionTxnRequest collections = 2;
 }
 
-message TxnResponse { repeated TypedValue collection_values = 1; }
+message DatabaseTxnResponse { repeated CollectionTxnResponse collections = 1; }
+
+message CollectionTxnRequest {
+  uint64 collection_id = 1;
+  repeated MethodCallExpr exprs = 2;
+}
+
+message CollectionTxnResponse { repeated Value values = 1; }

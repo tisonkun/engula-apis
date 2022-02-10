@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package engula.v1;
+
+message TypeSpec {
+  oneof spec { Int64Spec int64_spec = 1; }
+}
+
+message Int64Spec {}
