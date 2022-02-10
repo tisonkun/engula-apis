@@ -6,8 +6,7 @@ import "object/expr.proto";
 import "object/value.proto";
 
 service Txn {
-  rpc Read(TxnRequest) returns (TxnResponse) {}
-  rpc Write(TxnRequest) returns (TxnResponse) {}
+  rpc Call(TxnRequest) returns (TxnResponse) {}
 }
 
 message TxnRequest { repeated DatabaseTxnRequest requests = 1; }
@@ -26,4 +25,4 @@ message CollectionTxnRequest {
   repeated MethodCallExpr exprs = 2;
 }
 
-message CollectionTxnResponse { repeated Value values = 1; }
+message CollectionTxnResponse { repeated GenericValue values = 1; }

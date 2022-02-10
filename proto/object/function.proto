@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package engula.v1;
 
-enum GeneralFunction {
+enum GenericFunction {
   GET = 0;
   SET = 1;
   DELETE = 2;

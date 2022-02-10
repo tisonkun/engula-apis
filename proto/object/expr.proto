@@ -7,10 +7,10 @@ import "object/function.proto";
 
 message CallExpr {
   oneof function {
-    GeneralFunction general = 1;
+    GenericFunction generic = 1;
     NumericFunction numeric = 2;
   }
-  repeated Value arguments = 15;
+  repeated GenericValue arguments = 15;
 }
 
 message MethodCallExpr {
