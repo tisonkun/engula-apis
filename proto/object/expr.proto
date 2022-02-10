@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package engula.v1;
+
+import "object/value.proto";
+import "object/function.proto";
+
+message CallExpr {
+  oneof function {
+    GeneralFunction general = 1;
+    NumericFunction numeric = 2;
+  }
+  repeated Value arguments = 15;
+}
+
+message MethodCallExpr {
+  bytes id = 1;
+  CallExpr call = 2;
+}

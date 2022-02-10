@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package engula.v1;
 
-import "object/object.proto";
+import "object/spec.proto";
 
 service Universe {
   rpc Databases(DatabasesRequest) returns (DatabasesResponse) {}
@@ -139,6 +139,6 @@ message CollectionSpec {
 
 message CollectionDesc {
   uint64 id = 1;
-  uint64 parent_id = 2;
+  uint64 database_id = 2;
   CollectionSpec spec = 3;
 }

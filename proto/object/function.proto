@@ -7,3 +7,5 @@ enum GeneralFunction {
   SET = 1;
   DELETE = 2;
 }
+
+enum NumericFunction { ADD = 0; }
