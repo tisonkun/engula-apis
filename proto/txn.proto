@@ -6,23 +6,23 @@ import "object/expr.proto";
 import "object/value.proto";
 
 service Txn {
-  rpc Call(TxnRequest) returns (TxnResponse) {}
+  rpc Batch(BatchTxnRequest) returns (BatchTxnResponse) {}
 }
 
-message TxnRequest { repeated DatabaseTxnRequest requests = 1; }
+message BatchTxnRequest { repeated DatabaseTxnRequest requests = 1; }
 
-message TxnResponse { repeated DatabaseTxnResponse responses = 1; }
+message BatchTxnResponse { repeated DatabaseTxnResponse responses = 1; }
 
 message DatabaseTxnRequest {
-  uint64 database_id = 1;
+  string name = 1;
   repeated CollectionTxnRequest collections = 2;
 }
 
 message DatabaseTxnResponse { repeated CollectionTxnResponse collections = 1; }
 
 message CollectionTxnRequest {
-  uint64 collection_id = 1;
-  repeated MethodCallExpr exprs = 2;
+  string name = 1;
+  repeated MethodCallExpr methods = 2;
 }
 
-message CollectionTxnResponse { repeated GenericValue values = 1; }
+message CollectionTxnResponse { repeated MethodCallResult results = 1; }

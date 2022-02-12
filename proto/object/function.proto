@@ -5,7 +5,14 @@ package engula.v1;
 enum GenericFunction {
   GET = 0;
   SET = 1;
-  DELETE = 2;
 }
 
 enum NumericFunction { ADD = 0; }
+
+enum ContainerFunction {
+  LEN = 0;
+  INSERT = 1;
+  UPDATE = 2;
+  DELETE = 3;
+  REMOVE = 4;
+}

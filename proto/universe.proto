@@ -2,19 +2,17 @@ syntax = "proto3";
 
 package engula.v1;
 
-import "object/spec.proto";
-
 service Universe {
   rpc Databases(DatabasesRequest) returns (DatabasesResponse) {}
 
   rpc Collections(CollectionsRequest) returns (CollectionsResponse) {}
 }
 
-message DatabasesRequest { DatabasesRequestUnion request = 1; }
+message DatabasesRequest { repeated DatabaseRequestUnion requests = 1; }
 
-message DatabasesResponse { DatabasesResponseUnion response = 1; }
+message DatabasesResponse { repeated DatabaseResponseUnion responses = 1; }
 
-message DatabasesRequestUnion {
+message DatabaseRequestUnion {
   oneof request {
     ListDatabasesRequest list_databases = 1;
     CreateDatabaseRequest create_database = 2;
@@ -24,7 +22,7 @@ message DatabasesRequestUnion {
   }
 }
 
-message DatabasesResponseUnion {
+message DatabaseResponseUnion {
   oneof response {
     ListDatabasesResponse list_databases = 1;
     CreateDatabaseResponse create_database = 2;
@@ -45,35 +43,28 @@ message CreateDatabaseRequest { DatabaseSpec spec = 1; }
 message CreateDatabaseResponse { DatabaseDesc desc = 1; }
 
 message UpdateDatabaseRequest {
-  uint64 id = 1;
-  string name = 2;
-  DatabaseSpec spec = 3;
+  string name = 1;
+  DatabaseSpec spec = 2;
 }
 
 message UpdateDatabaseResponse { DatabaseDesc desc = 1; }
 
-message DeleteDatabaseRequest {
-  uint64 id = 1;
-  string name = 2;
-}
+message DeleteDatabaseRequest { string name = 1; }
 
 message DeleteDatabaseResponse {}
 
-message DescribeDatabaseRequest {
-  uint64 id = 1;
-  string name = 2;
-}
+message DescribeDatabaseRequest { string name = 1; }
 
 message DescribeDatabaseResponse { DatabaseDesc desc = 1; }
 
 message CollectionsRequest {
-  uint64 database_id = 1;
-  CollectionsRequestUnion request = 2;
+  string dbname = 1;
+  repeated CollectionRequestUnion requests = 2;
 }
 
-message CollectionsResponse { CollectionsResponseUnion response = 1; }
+message CollectionsResponse { repeated CollectionResponseUnion responses = 1; }
 
-message CollectionsRequestUnion {
+message CollectionRequestUnion {
   oneof request {
     ListCollectionsRequest list_collections = 1;
     CreateCollectionRequest create_collection = 2;
@@ -83,7 +74,7 @@ message CollectionsRequestUnion {
   }
 }
 
-message CollectionsResponseUnion {
+message CollectionResponseUnion {
   oneof response {
     ListCollectionsResponse list_collections = 1;
     CreateCollectionResponse create_collection = 2;
@@ -104,24 +95,17 @@ message CreateCollectionRequest { CollectionSpec spec = 1; }
 message CreateCollectionResponse { CollectionDesc desc = 1; }
 
 message UpdateCollectionRequest {
-  uint64 id = 1;
-  string name = 2;
-  CollectionSpec spec = 3;
+  string name = 1;
+  CollectionSpec spec = 2;
 }
 
 message UpdateCollectionResponse { CollectionDesc desc = 1; }
 
-message DeleteCollectionRequest {
-  uint64 id = 1;
-  string name = 2;
-}
+message DeleteCollectionRequest { string name = 1; }
 
 message DeleteCollectionResponse {}
 
-message DescribeCollectionRequest {
-  uint64 id = 1;
-  string name = 2;
-}
+message DescribeCollectionRequest { string name = 1; }
 
 message DescribeCollectionResponse { CollectionDesc desc = 1; }
 
@@ -132,10 +116,7 @@ message DatabaseDesc {
   DatabaseSpec spec = 2;
 }
 
-message CollectionSpec {
-  string name = 1;
-  TypeSpec type_spec = 2;
-}
+message CollectionSpec { string name = 1; }
 
 message CollectionDesc {
   uint64 id = 1;

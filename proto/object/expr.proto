@@ -5,15 +5,27 @@ package engula.v1;
 import "object/value.proto";
 import "object/function.proto";
 
+// TODO:
+// - errors
+// - filters
+// - conditions
+
 message CallExpr {
   oneof function {
     GenericFunction generic = 1;
     NumericFunction numeric = 2;
+    ContainerFunction container = 3;
   }
   repeated GenericValue arguments = 15;
 }
 
 message MethodCallExpr {
-  bytes id = 1;
-  CallExpr call = 2;
+  oneof index {
+    bytes blob_ident = 1;
+    sint64 int64_ident = 2;
+  }
+  CallExpr call = 3;
+  repeated MethodCallExpr members = 4;
 }
+
+message MethodCallResult { GenericValue value = 1; }
