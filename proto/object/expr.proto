@@ -10,7 +10,10 @@ import "object/function.proto";
 // - filters
 // - conditions
 
-message Expr { CallExpr call = 1; }
+message Expr {
+  bytes id = 1;
+  CallExpr call = 2;
+}
 
 message ExprResult { GenericValue value = 1; }
 

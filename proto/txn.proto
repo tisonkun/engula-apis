@@ -15,10 +15,10 @@ message BatchTxnResponse { repeated DatabaseTxnResponse responses = 1; }
 
 message DatabaseTxnRequest {
   string name = 1;
-  repeated CollectionTxnRequest collections = 2;
+  repeated CollectionTxnRequest requests = 2;
 }
 
-message DatabaseTxnResponse { repeated CollectionTxnResponse collections = 1; }
+message DatabaseTxnResponse { repeated CollectionTxnResponse responses = 1; }
 
 message CollectionTxnRequest {
   string name = 1;
