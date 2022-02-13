@@ -3,14 +3,14 @@ syntax = "proto3";
 package engula.v1;
 
 service Universe {
-  rpc Databases(DatabasesRequest) returns (DatabasesResponse) {}
+  rpc Database(DatabaseRequest) returns (DatabaseResponse) {}
 
-  rpc Collections(CollectionsRequest) returns (CollectionsResponse) {}
+  rpc Collection(CollectionRequest) returns (CollectionResponse) {}
 }
 
-message DatabasesRequest { repeated DatabaseRequestUnion requests = 1; }
+message DatabaseRequest { repeated DatabaseRequestUnion requests = 1; }
 
-message DatabasesResponse { repeated DatabaseResponseUnion responses = 1; }
+message DatabaseResponse { repeated DatabaseResponseUnion responses = 1; }
 
 message DatabaseRequestUnion {
   oneof request {
@@ -57,12 +57,12 @@ message DescribeDatabaseRequest { string name = 1; }
 
 message DescribeDatabaseResponse { DatabaseDesc desc = 1; }
 
-message CollectionsRequest {
+message CollectionRequest {
   string dbname = 1;
   repeated CollectionRequestUnion requests = 2;
 }
 
-message CollectionsResponse { repeated CollectionResponseUnion responses = 1; }
+message CollectionResponse { repeated CollectionResponseUnion responses = 1; }
 
 message CollectionRequestUnion {
   oneof request {
