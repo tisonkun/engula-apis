@@ -4,12 +4,11 @@ package engula.v1;
 
 message GenericValue {
   oneof value {
-    bool bool_value = 1;
-    bytes blob_value = 2;
-    string text_value = 3;
-    sint64 int64_value = 4;
-    double float64_value = 5;
-    // decimal_value = 6;
+    bytes blob_value = 1;
+    string text_value = 2;
+    sint64 int64_value = 3;
+    double float64_value = 4;
+    // decimal_value = 5;
     MappingValue mapping_value = 14;
     RepeatedValue repeated_value = 15;
   }
@@ -20,4 +19,9 @@ message MappingValue {
   repeated GenericValue values = 2;
 }
 
-message RepeatedValue { repeated GenericValue values = 1; }
+message RepeatedValue {
+  repeated bytes blob_values = 1;
+  repeated string text_values = 2;
+  repeated sint64 int64_values = 3;
+  repeated GenericValue values = 15;
+}
