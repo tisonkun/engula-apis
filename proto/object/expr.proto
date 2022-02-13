@@ -10,22 +10,11 @@ import "object/function.proto";
 // - filters
 // - conditions
 
+message Expr { CallExpr call = 1; }
+
+message ExprResult { GenericValue value = 1; }
+
 message CallExpr {
-  oneof function {
-    GenericFunction generic = 1;
-    NumericFunction numeric = 2;
-    ContainerFunction container = 3;
-  }
-  repeated GenericValue arguments = 15;
+  Function func = 1;
+  repeated GenericValue args = 15;
 }
-
-message MethodCallExpr {
-  oneof index {
-    bytes blob_ident = 1;
-    sint64 int64_ident = 2;
-  }
-  CallExpr call = 3;
-  repeated MethodCallExpr members = 4;
-}
-
-message MethodCallResult { GenericValue value = 1; }
