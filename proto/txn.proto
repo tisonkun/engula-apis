@@ -22,7 +22,7 @@ message DatabaseTxnResponse { repeated CollectionTxnResponse collections = 1; }
 
 message CollectionTxnRequest {
   string name = 1;
-  repeated MethodCallExpr methods = 2;
+  repeated Expr exprs = 2;
 }
 
-message CollectionTxnResponse { repeated MethodCallResult results = 1; }
+message CollectionTxnResponse { repeated ExprResult results = 1; }

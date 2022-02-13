@@ -11,13 +11,13 @@ message GenericValue {
     double float64_value = 5;
     // decimal_value = 6;
     MappingValue mapping_value = 14;
-    SequenceValue sequence_value = 15;
+    RepeatedValue repeated_value = 15;
   }
 }
 
 message MappingValue {
   repeated bytes keys = 1;
-  SequenceValue values = 2;
+  repeated GenericValue values = 2;
 }
 
-message SequenceValue { repeated GenericValue values = 1; }
+message RepeatedValue { repeated GenericValue values = 1; }
