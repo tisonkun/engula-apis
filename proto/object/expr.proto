@@ -15,9 +15,9 @@ message Expr {
   CallExpr call = 2;
 }
 
-message ExprResult { GenericValue value = 1; }
+message ExprResult { Value value = 1; }
 
 message CallExpr {
   Function func = 1;
-  repeated GenericValue args = 15;
+  repeated Value args = 15;
 }
