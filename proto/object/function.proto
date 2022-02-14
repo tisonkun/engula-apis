@@ -6,4 +6,6 @@ enum Function {
   GET = 0;
   SET = 1;
   DELETE = 2;
+  ADD_ASSIGN = 3;
+  SUB_ASSIGN = 4;
 }
