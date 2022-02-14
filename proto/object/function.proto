@@ -11,4 +11,5 @@ enum Function {
   LEN = 5;
   POP = 6;
   PUSH = 7;
+  APPEND = 8;
 }
