@@ -10,14 +10,14 @@ message Value {
     sint64 int64_value = 4;
     // double float64_value = 5;
     // decimal_value = 6;
-    MapValue map_value = 14;
-    ListValue list_value = 15;
+    SequenceValue sequence_value = 14;
+    AssociativeValue Associative_value = 15;
   }
 }
 
-message MapValue {
+message SequenceValue { repeated Value values = 1; }
+
+message AssociativeValue {
   repeated bytes keys = 1;
   repeated Value values = 2;
 }
-
-message ListValue { repeated Value values = 1; }

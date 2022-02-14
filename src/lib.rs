@@ -16,6 +16,8 @@
 
 tonic::include_proto!("engula.v1");
 
+use std::collections::HashMap;
+
 impl Value {
     pub fn as_i64(self) -> Option<i64> {
         self.value.and_then(|v| {
@@ -68,47 +70,41 @@ impl From<i64> for Value {
     }
 }
 
-impl From<ListValue> for Value {
-    fn from(v: ListValue) -> Self {
+impl From<SequenceValue> for Value {
+    fn from(v: SequenceValue) -> Self {
         Self {
-            value: Some(value::Value::ListValue(v)),
+            value: Some(value::Value::SequenceValue(v)),
         }
     }
 }
 
-impl From<Vec<Value>> for Value {
-    fn from(values: Vec<Value>) -> Self {
-        ListValue {
-            values,
-            ..Default::default()
-        }
-        .into()
-    }
-}
-
-impl From<Vec<Vec<u8>>> for Value {
-    fn from(values: Vec<Vec<u8>>) -> Self {
-        ListValue {
+impl<T: Into<Value>> From<Vec<T>> for Value {
+    fn from(values: Vec<T>) -> Self {
+        SequenceValue {
             values: values.into_iter().map(|v| v.into()).collect(),
         }
         .into()
     }
 }
 
-impl From<Vec<String>> for Value {
-    fn from(values: Vec<String>) -> Self {
-        ListValue {
-            values: values.into_iter().map(|v| v.into()).collect(),
+impl From<AssociativeValue> for Value {
+    fn from(v: AssociativeValue) -> Self {
+        Self {
+            value: Some(value::Value::AssociativeValue(v)),
         }
-        .into()
     }
 }
 
-impl From<Vec<i64>> for Value {
-    fn from(values: Vec<i64>) -> Self {
-        ListValue {
-            values: values.into_iter().map(|v| v.into()).collect(),
-        }
-        .into()
+impl<T: Into<Value>> From<HashMap<Vec<u8>, T>> for Value {
+    fn from(map: HashMap<Vec<u8>, T>) -> Self {
+        let (keys, values) = map.into_iter().fold(
+            (Vec::new(), Vec::new()),
+            |(mut keys, mut values), (k, v)| {
+                keys.push(k);
+                values.push(v.into());
+                (keys, values)
+            },
+        );
+        AssociativeValue { keys, values }.into()
     }
 }
