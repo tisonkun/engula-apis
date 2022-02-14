@@ -8,4 +8,7 @@ enum Function {
   DELETE = 2;
   ADD_ASSIGN = 3;
   SUB_ASSIGN = 4;
+  LEN = 5;
+  POP = 6;
+  PUSH = 7;
 }

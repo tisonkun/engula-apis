@@ -16,6 +16,18 @@
 
 tonic::include_proto!("engula.v1");
 
+impl Value {
+    pub fn as_i64(self) -> Option<i64> {
+        self.value.and_then(|v| {
+            if let value::Value::Int64Value(v) = v {
+                Some(v)
+            } else {
+                None
+            }
+        })
+    }
+}
+
 impl From<&[u8]> for Value {
     fn from(v: &[u8]) -> Self {
         Self {
@@ -65,9 +77,9 @@ impl From<ListValue> for Value {
 }
 
 impl From<Vec<Value>> for Value {
-    fn from(v: Vec<Value>) -> Self {
+    fn from(values: Vec<Value>) -> Self {
         ListValue {
-            values: v,
+            values,
             ..Default::default()
         }
         .into()
@@ -75,30 +87,27 @@ impl From<Vec<Value>> for Value {
 }
 
 impl From<Vec<Vec<u8>>> for Value {
-    fn from(v: Vec<Vec<u8>>) -> Self {
+    fn from(values: Vec<Vec<u8>>) -> Self {
         ListValue {
-            blob_values: v,
-            ..Default::default()
+            values: values.into_iter().map(|v| v.into()).collect(),
         }
         .into()
     }
 }
 
 impl From<Vec<String>> for Value {
-    fn from(v: Vec<String>) -> Self {
+    fn from(values: Vec<String>) -> Self {
         ListValue {
-            text_values: v,
-            ..Default::default()
+            values: values.into_iter().map(|v| v.into()).collect(),
         }
         .into()
     }
 }
 
 impl From<Vec<i64>> for Value {
-    fn from(v: Vec<i64>) -> Self {
+    fn from(values: Vec<i64>) -> Self {
         ListValue {
-            int64_values: v,
-            ..Default::default()
+            values: values.into_iter().map(|v| v.into()).collect(),
         }
         .into()
     }
