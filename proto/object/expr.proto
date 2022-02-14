@@ -13,6 +13,7 @@ import "object/function.proto";
 message Expr {
   bytes id = 1;
   CallExpr call = 2;
+  repeated CallExpr subcalls = 3;
 }
 
 message ExprResult { Value value = 1; }

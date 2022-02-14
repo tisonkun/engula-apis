@@ -4,11 +4,11 @@ package engula.v1;
 
 message Value {
   oneof value {
-    bool bool_value = 1;
+    // bool bool_value = 1;
     bytes blob_value = 2;
     string text_value = 3;
     sint64 int64_value = 4;
-    double float64_value = 5;
+    // double float64_value = 5;
     // decimal_value = 6;
     MapValue map_value = 14;
     ListValue list_value = 15;
@@ -20,10 +20,4 @@ message MapValue {
   repeated Value values = 2;
 }
 
-message ListValue {
-  repeated Value values = 1;
-  repeated bool bool_values = 2;
-  repeated bytes blob_values = 3;
-  repeated string text_values = 4;
-  repeated sint64 int64_values = 5;
-}
+message ListValue { repeated Value values = 1; }
