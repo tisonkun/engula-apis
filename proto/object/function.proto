@@ -3,13 +3,23 @@ syntax = "proto3";
 package engula.v1;
 
 enum Function {
-  GET = 0;
-  SET = 1;
-  DELETE = 2;
-  ADD_ASSIGN = 3;
-  SUB_ASSIGN = 4;
-  LEN = 5;
-  POP = 6;
-  PUSH = 7;
-  APPEND = 8;
+  // Generic
+  NOOP = 0;
+
+  // Numeric
+  ADD = 11;
+  SUB = 12;
+
+  // Container
+  LEN = 21;
+  GET = 22;
+  SET = 23;
+  REMOVE = 24;
+
+  // Sequence
+  APPEND = 31;
+  POP_BACK = 32;
+  POP_FRONT = 33;
+  PUSH_BACK = 34;
+  PUSH_FRONT = 35;
 }

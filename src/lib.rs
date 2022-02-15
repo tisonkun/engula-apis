@@ -62,6 +62,14 @@ impl From<String> for Value {
     }
 }
 
+impl From<i32> for Value {
+    fn from(v: i32) -> Self {
+        Self {
+            value: Some(value::Value::Int64Value(v.into())),
+        }
+    }
+}
+
 impl From<i64> for Value {
     fn from(v: i64) -> Self {
         Self {
