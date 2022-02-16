@@ -38,14 +38,11 @@ message ListDatabasesRequest {
 
 message ListDatabasesResponse { repeated DatabaseDesc descs = 1; }
 
-message CreateDatabaseRequest { DatabaseSpec spec = 1; }
+message CreateDatabaseRequest { DatabaseDesc desc = 1; }
 
 message CreateDatabaseResponse { DatabaseDesc desc = 1; }
 
-message UpdateDatabaseRequest {
-  string name = 1;
-  DatabaseSpec spec = 2;
-}
+message UpdateDatabaseRequest { DatabaseDesc desc = 1; }
 
 message UpdateDatabaseResponse { DatabaseDesc desc = 1; }
 
@@ -90,14 +87,11 @@ message ListCollectionsRequest {
 
 message ListCollectionsResponse { repeated CollectionDesc descs = 1; }
 
-message CreateCollectionRequest { CollectionSpec spec = 1; }
+message CreateCollectionRequest { CollectionDesc desc = 1; }
 
 message CreateCollectionResponse { CollectionDesc desc = 1; }
 
-message UpdateCollectionRequest {
-  string name = 1;
-  CollectionSpec spec = 2;
-}
+message UpdateCollectionRequest { CollectionDesc desc = 1; }
 
 message UpdateCollectionResponse { CollectionDesc desc = 1; }
 
@@ -109,17 +103,13 @@ message DescribeCollectionRequest { string name = 1; }
 
 message DescribeCollectionResponse { CollectionDesc desc = 1; }
 
-message DatabaseSpec { string name = 1; }
-
 message DatabaseDesc {
   uint64 id = 1;
-  DatabaseSpec spec = 2;
+  string name = 2;
 }
-
-message CollectionSpec { string name = 1; }
 
 message CollectionDesc {
   uint64 id = 1;
-  uint64 database_id = 2;
-  CollectionSpec spec = 3;
+  string name = 2;
+  uint64 parent_id = 3;
 }
