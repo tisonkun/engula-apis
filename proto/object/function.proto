@@ -14,7 +14,7 @@ enum Function {
   LEN = 21;
   GET = 22;
   SET = 23;
-  REMOVE = 24;
+  DELETE = 24;
 
   // Sequence
   APPEND = 31;
