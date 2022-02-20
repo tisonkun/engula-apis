@@ -4,7 +4,10 @@ package engula.v1;
 
 enum Function {
   // Generic
-  NOOP = 0;
+  NOP = 0;
+  LOAD = 1;
+  STORE = 2;
+  RESET = 3;
 
   // Numeric
   ADD = 11;
@@ -12,14 +15,9 @@ enum Function {
 
   // Container
   LEN = 21;
-  GET = 22;
-  SET = 23;
-  DELETE = 24;
 
-  // Sequence
+  // Sequence container
   APPEND = 31;
-  POP_BACK = 32;
-  POP_FRONT = 33;
-  PUSH_BACK = 34;
-  PUSH_FRONT = 35;
+  PUSH_BACK = 32;
+  PUSH_FRONT = 33;
 }
