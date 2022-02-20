@@ -2,22 +2,20 @@ syntax = "proto3";
 
 package engula.v1;
 
-message Value {
+message ValueUnion {
   oneof value {
-    // bool bool_value = 1;
-    bytes blob_value = 2;
-    string text_value = 3;
-    sint64 int64_value = 4;
-    // double float64_value = 5;
-    // decimal_value = 6;
-    SequenceValue sequence_value = 14;
-    AssociativeValue Associative_value = 15;
+    sint64 i64_value = 1;
+    double f64_value = 2;
+    bytes blob_value = 3;
+    string text_value = 4;
+    MappingValue mapping_value = 14;
+    RepeatedValue repeated_value = 15;
   }
 }
 
-message SequenceValue { repeated Value values = 1; }
-
-message AssociativeValue {
-  repeated bytes keys = 1;
-  repeated Value values = 2;
+message MappingValue {
+  repeated ValueUnion keys = 1;
+  repeated ValueUnion values = 2;
 }
+
+message RepeatedValue { repeated ValueUnion values = 1; }

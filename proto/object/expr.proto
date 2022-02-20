@@ -11,14 +11,17 @@ import "object/function.proto";
 // - conditions
 
 message Expr {
-  bytes id = 1;
-  CallExpr call = 2;
-  repeated CallExpr subcalls = 3;
+  oneof from {
+    bytes id = 1;
+    ValueUnion index = 2;
+  }
+  CallExpr call = 3;
+  repeated Expr subexprs = 4;
 }
 
-message ExprResult { Value value = 1; }
+message ExprResult { repeated ValueUnion values = 1; }
 
 message CallExpr {
   Function func = 1;
-  repeated Value args = 2;
+  repeated ValueUnion args = 2;
 }
