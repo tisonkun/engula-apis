@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package engula.v1;
 
-import "object/value.proto";
-import "object/function.proto";
+import "engula/v1/value.proto";
+import "engula/v1/function.proto";
 
 // TODO:
 // - errors

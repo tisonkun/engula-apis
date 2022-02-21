@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package engula.v1;
 
-import "object/expr.proto";
+import "engula/v1/expr.proto";
 
 message TxnRequest { repeated DatabaseTxnRequest requests = 1; }
 
