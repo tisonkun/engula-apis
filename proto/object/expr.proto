@@ -13,15 +13,15 @@ import "object/function.proto";
 message Expr {
   oneof from {
     bytes id = 1;
-    ValueUnion index = 2;
+    GenericValue index = 2;
   }
   CallExpr call = 3;
   repeated Expr subexprs = 4;
 }
 
-message ExprResult { repeated ValueUnion values = 1; }
+message ExprResult { repeated GenericValue values = 1; }
 
 message CallExpr {
   Function func = 1;
-  repeated ValueUnion args = 2;
+  repeated GenericValue args = 2;
 }

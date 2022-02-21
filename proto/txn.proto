@@ -3,15 +3,10 @@ syntax = "proto3";
 package engula.v1;
 
 import "object/expr.proto";
-import "object/value.proto";
 
-service Txn {
-  rpc Batch(BatchTxnRequest) returns (BatchTxnResponse) {}
-}
+message TxnRequest { repeated DatabaseTxnRequest requests = 1; }
 
-message BatchTxnRequest { repeated DatabaseTxnRequest requests = 1; }
-
-message BatchTxnResponse { repeated DatabaseTxnResponse responses = 1; }
+message TxnResponse { repeated DatabaseTxnResponse responses = 1; }
 
 message DatabaseTxnRequest {
   string name = 1;

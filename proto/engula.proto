@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package engula.v1;
+
+import "txn.proto";
+import "database.proto";
+import "collection.proto";
+
+service Engula {
+  rpc Txn(TxnRequest) returns (TxnResponse) {}
+
+  rpc Database(DatabaseRequest) returns (DatabaseResponse) {}
+
+  rpc Collection(CollectionRequest) returns (CollectionResponse) {}
+}

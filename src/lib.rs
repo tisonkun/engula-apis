@@ -18,22 +18,24 @@ tonic::include_proto!("engula.v1");
 
 use std::collections::HashMap;
 
-pub type Value = value_union::Value;
+pub type Value = generic_value::Value;
 
-impl From<Value> for ValueUnion {
-    fn from(v: Value) -> Self {
-        Self { value: Some(v) }
+impl<T: Into<Value>> From<T> for GenericValue {
+    fn from(v: T) -> Self {
+        Self {
+            value: Some(v.into()),
+        }
     }
 }
 
-impl From<Option<Value>> for ValueUnion {
+impl From<Option<Value>> for GenericValue {
     fn from(v: Option<Value>) -> Self {
         Self { value: v }
     }
 }
 
-impl From<ValueUnion> for Option<Value> {
-    fn from(v: ValueUnion) -> Self {
+impl From<GenericValue> for Option<Value> {
+    fn from(v: GenericValue) -> Self {
         v.value
     }
 }

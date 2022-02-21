@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package engula.v1;
+
+message CollectionDesc {
+  uint64 id = 1;
+  string name = 2;
+  uint64 parent_id = 3;
+}
+
+message CollectionRequest {
+  string dbname = 1;
+  repeated CollectionRequestUnion requests = 2;
+}
+
+message CollectionResponse { repeated CollectionResponseUnion responses = 1; }
+
+message CollectionRequestUnion {
+  oneof request {
+    ListCollectionsRequest list_collections = 1;
+    CreateCollectionRequest create_collection = 2;
+    UpdateCollectionRequest update_collection = 3;
+    DeleteCollectionRequest delete_collection = 4;
+    DescribeCollectionRequest describe_collection = 5;
+  }
+}
+
+message CollectionResponseUnion {
+  oneof response {
+    ListCollectionsResponse list_collections = 1;
+    CreateCollectionResponse create_collection = 2;
+    UpdateCollectionResponse update_collection = 3;
+    DeleteCollectionResponse delete_collection = 4;
+    DescribeCollectionResponse describe_collection = 5;
+  }
+}
+
+message ListCollectionsRequest {}
+
+message ListCollectionsResponse { repeated CollectionDesc descs = 1; }
+
+message CreateCollectionRequest { CollectionDesc desc = 1; }
+
+message CreateCollectionResponse { CollectionDesc desc = 1; }
+
+message UpdateCollectionRequest { CollectionDesc desc = 1; }
+
+message UpdateCollectionResponse { CollectionDesc desc = 1; }
+
+message DeleteCollectionRequest { string name = 1; }
+
+message DeleteCollectionResponse {}
+
+message DescribeCollectionRequest { string name = 1; }
+
+message DescribeCollectionResponse { CollectionDesc desc = 1; }
