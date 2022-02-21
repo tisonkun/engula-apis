@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package engula.v1;
 
-message ValueUnion {
+message GenericValue {
   oneof value {
     sint64 i64_value = 1;
     double f64_value = 2;
@@ -14,8 +14,8 @@ message ValueUnion {
 }
 
 message MappingValue {
-  repeated ValueUnion keys = 1;
-  repeated ValueUnion values = 2;
+  repeated GenericValue keys = 1;
+  repeated GenericValue values = 2;
 }
 
-message RepeatedValue { repeated ValueUnion values = 1; }
+message RepeatedValue { repeated GenericValue values = 1; }

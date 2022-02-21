@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package engula.v1;
+
+message DatabaseDesc {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message DatabaseRequest { repeated DatabaseRequestUnion requests = 1; }
+
+message DatabaseResponse { repeated DatabaseResponseUnion responses = 1; }
+
+message DatabaseRequestUnion {
+  oneof request {
+    ListDatabasesRequest list_databases = 1;
+    CreateDatabaseRequest create_database = 2;
+    UpdateDatabaseRequest update_database = 3;
+    DeleteDatabaseRequest delete_database = 4;
+    DescribeDatabaseRequest describe_database = 5;
+  }
+}
+
+message DatabaseResponseUnion {
+  oneof response {
+    ListDatabasesResponse list_databases = 1;
+    CreateDatabaseResponse create_database = 2;
+    UpdateDatabaseResponse update_database = 3;
+    DeleteDatabaseResponse delete_database = 4;
+    DescribeDatabaseResponse describe_database = 5;
+  }
+}
+
+message ListDatabasesRequest {}
+
+message ListDatabasesResponse { repeated DatabaseDesc descs = 1; }
+
+message CreateDatabaseRequest { DatabaseDesc desc = 1; }
+
+message CreateDatabaseResponse { DatabaseDesc desc = 1; }
+
+message UpdateDatabaseRequest { DatabaseDesc desc = 1; }
+
+message UpdateDatabaseResponse { DatabaseDesc desc = 1; }
+
+message DeleteDatabaseRequest { string name = 1; }
+
+message DeleteDatabaseResponse {}
+
+message DescribeDatabaseRequest { string name = 1; }
+
+message DescribeDatabaseResponse { DatabaseDesc desc = 1; }
