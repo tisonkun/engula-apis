@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package engula.v1;
+
+import "engula/v1/expr.proto";
+import "engula/v1/value.proto";
+import "engula/v1/function.proto";
+
+message MutateDatabaseRequest {
+  string name = 1;
+  repeated MutateCollectionRequest requests = 2;
+}
+
+message MutateDatabaseResponse {
+  repeated MutateCollectionResponse responses = 1;
+}
+
+message MutateCollectionRequest {
+  string name = 1;
+  repeated MappingMutateExpr exprs = 2;
+}
+
+message MutateCollectionResponse { repeated MutateResult results = 1; }
+
+message MutateExpr {
+  oneof expr {
+    CallExpr call = 1;
+    MappingMutateExpr mapping = 2;
+    SequenceMutateExpr sequence = 3;
+  }
+}
+
+message MutateResult { repeated ValueUnion results = 1; }
+
+message MappingMutateExpr {
+  oneof from {
+    bytes index = 1;
+    // MappingRangeExpr range = 2;
+  }
+  MutateExpr select = 3;
+}
+
+message SequenceMutateExpr {
+  oneof from {
+    sint64 index = 1;
+    // ListRangeExpr range = 2;
+  }
+  MutateExpr select = 3;
+}

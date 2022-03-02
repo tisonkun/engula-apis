@@ -18,9 +18,9 @@ tonic::include_proto!("engula.v1");
 
 use std::collections::HashMap;
 
-pub type Value = generic_value::Value;
+pub type Value = value_union::Value;
 
-impl<T: Into<Value>> From<T> for GenericValue {
+impl<T: Into<Value>> From<T> for ValueUnion {
     fn from(v: T) -> Self {
         Self {
             value: Some(v.into()),
@@ -28,14 +28,14 @@ impl<T: Into<Value>> From<T> for GenericValue {
     }
 }
 
-impl From<Option<Value>> for GenericValue {
+impl From<Option<Value>> for ValueUnion {
     fn from(v: Option<Value>) -> Self {
         Self { value: v }
     }
 }
 
-impl From<GenericValue> for Option<Value> {
-    fn from(v: GenericValue) -> Self {
+impl From<ValueUnion> for Option<Value> {
+    fn from(v: ValueUnion) -> Self {
         v.value
     }
 }
@@ -82,9 +82,9 @@ impl From<String> for Value {
     }
 }
 
-impl From<MappingValue> for Value {
-    fn from(v: MappingValue) -> Self {
-        Value::MappingValue(v)
+impl From<MapValue> for Value {
+    fn from(v: MapValue) -> Self {
+        Value::MapValue(v)
     }
 }
 
@@ -102,13 +102,13 @@ where
                 (keys, values)
             },
         );
-        MappingValue { keys, values }.into()
+        MapValue { keys, values }.into()
     }
 }
 
-impl From<RepeatedValue> for Value {
-    fn from(v: RepeatedValue) -> Self {
-        Self::RepeatedValue(v)
+impl From<ListValue> for Value {
+    fn from(v: ListValue) -> Self {
+        Self::ListValue(v)
     }
 }
 
@@ -117,7 +117,7 @@ where
     T: Into<Value>,
 {
     fn from(values: Vec<T>) -> Self {
-        RepeatedValue {
+        ListValue {
             values: values.into_iter().map(|v| v.into().into()).collect(),
         }
         .into()
