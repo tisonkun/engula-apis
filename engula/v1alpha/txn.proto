@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package engula.v1alpha;
+
+service Txn {
+  rpc Batch(BatchTxnRequest) returns (BatchTxnResponse) {}
+}
+
+message BatchTxnRequest {
+  repeated SelectDatabaseRequest selects = 1;
+  repeated MutateDatabaseRequest mutates = 2;
+}
+
+message BatchTxnResponse {
+  repeated SelectDatabaseResponse selects = 1;
+  repeated MutateDatabaseResponse mutates = 2;
+}
+
+message SelectDatabaseRequest {
+  string name = 1;
+  repeated SelectCollectionRequest requests = 2;
+}
+
+message SelectDatabaseResponse {
+  repeated SelectCollectionResponse responses = 1;
+}
+
+message SelectCollectionRequest { string name = 1; }
+
+message SelectCollectionResponse { repeated ValueUnion values = 1; }
+
+message MutateDatabaseRequest {
+  string name = 1;
+  repeated MutateCollectionRequest requests = 2;
+}
+
+message MutateDatabaseResponse {
+  repeated MutateCollectionResponse responses = 1;
+}
+
+message MutateCollectionRequest { string name = 1; }
+
+message MutateCollectionResponse { repeated ValueUnion values = 1; }
+
+message ValueUnion {
+  oneof value {
+    sint64 i64_value = 1;
+    double f64_value = 2;
+    bytes blob_value = 3;
+    string text_value = 4;
+    MapValue map_value = 10;
+    MapValue set_value = 11;
+    ListValue list_value = 12;
+  }
+}
+
+message MapValue {
+  repeated ValueUnion keys = 1;
+  repeated ValueUnion values = 2;
+}
+
+message ListValue { repeated ValueUnion values = 1; }

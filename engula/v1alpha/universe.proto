@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package engula.v1alpha;
+
+service Universe {
+  rpc Batch(BatchUniverseRequest) returns (BatchUniverseResponse) {}
+}
+
+message BatchUniverseRequest { repeated UniverseRequest requests = 1; }
+
+message BatchUniverseResponse { repeated UniverseResponse responses = 1; }
+
+message UniverseRequest {
+  oneof request {
+    ListDatabasesRequest list_databases = 1;
+    CreateDatabaseRequest create_database = 2;
+    UpdateDatabaseRequest update_database = 3;
+    DeleteDatabaseRequest delete_database = 4;
+    DescribeDatabaseRequest describe_database = 5;
+    ListCollectionsRequest list_collections = 6;
+    CreateCollectionRequest create_collection = 7;
+    UpdateCollectionRequest update_collection = 8;
+    DeleteCollectionRequest delete_collection = 9;
+    DescribeCollectionRequest describe_collection = 10;
+  }
+}
+
+message UniverseResponse {
+  oneof response {
+    ListDatabasesResponse list_databases = 1;
+    CreateDatabaseResponse create_database = 2;
+    UpdateDatabaseResponse update_database = 3;
+    DeleteDatabaseResponse delete_database = 4;
+    DescribeDatabaseResponse describe_database = 5;
+    ListCollectionsResponse list_collections = 6;
+    CreateCollectionResponse create_collection = 7;
+    UpdateCollectionResponse update_collection = 8;
+    DeleteCollectionResponse delete_collection = 9;
+    DescribeCollectionResponse describe_collection = 10;
+  }
+}
+
+message ListDatabasesRequest {
+  uint64 page_size = 1;
+  string page_token = 2;
+}
+
+message ListDatabasesResponse {
+  repeated DatabaseDesc descs = 1;
+  string next_page_token = 2;
+}
+
+message CreateDatabaseRequest {
+  string name = 1;
+  DatabaseOptions options = 2;
+}
+
+message CreateDatabaseResponse { DatabaseDesc desc = 1; }
+
+message UpdateDatabaseRequest {
+  string name = 1;
+  DatabaseOptions options = 2;
+}
+
+message UpdateDatabaseResponse { DatabaseDesc desc = 1; }
+
+message DeleteDatabaseRequest { string name = 1; }
+
+message DeleteDatabaseResponse {}
+
+message DescribeDatabaseRequest { string name = 1; }
+
+message DescribeDatabaseResponse { DatabaseDesc desc = 1; }
+
+message ListCollectionsRequest {
+  string name = 1;
+  uint64 page_size = 2;
+  string page_token = 3;
+}
+
+message ListCollectionsResponse {
+  repeated CollectionDesc descs = 1;
+  string next_page_token = 2;
+}
+
+message CreateCollectionRequest {
+  string name = 1;
+  string dbname = 2;
+  CollectionOptions options = 3;
+}
+
+message CreateCollectionResponse { CollectionDesc desc = 1; }
+
+message UpdateCollectionRequest {
+  string name = 1;
+  string dbname = 2;
+  CollectionOptions options = 3;
+}
+
+message UpdateCollectionResponse { CollectionDesc desc = 1; }
+
+message DeleteCollectionRequest {
+  string name = 1;
+  string dbname = 2;
+}
+
+message DeleteCollectionResponse {}
+
+message DescribeCollectionRequest {
+  string name = 1;
+  string dbname = 2;
+}
+
+message DescribeCollectionResponse { CollectionDesc desc = 1; }
+
+message DatabaseDesc {
+  uint64 id = 1;
+  string name = 2;
+  DatabaseOptions options = 3;
+  DatabaseProperties properties = 4;
+}
+
+message DatabaseOptions {}
+
+message DatabaseProperties { uint64 num_collections = 1; }
+
+message CollectionDesc {
+  uint64 id = 1;
+  string name = 2;
+  uint64 database_id = 3;
+  string database_name = 4;
+  CollectionOptions options = 5;
+  CollectionProperties properties = 6;
+}
+
+message CollectionOptions {}
+
+message CollectionProperties {}

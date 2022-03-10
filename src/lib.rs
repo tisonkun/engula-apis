@@ -16,6 +16,10 @@
 
 tonic::include_proto!("engula.v1");
 
+pub mod v1 {
+    tonic::include_proto!("engula.v1alpha");
+}
+
 use std::collections::HashMap;
 
 pub type Value = value_union::Value;
