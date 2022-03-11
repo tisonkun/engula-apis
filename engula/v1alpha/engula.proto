@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package engula.v1alpha;
+
+import "engula/v1alpha/txn.proto";
+import "engula/v1alpha/universe.proto";
+
+service Engula {
+  rpc Txn(BatchTxnRequest) returns (BatchTxnResponse) {}
+
+  rpc Universe(BatchUniverseRequest) returns (BatchUniverseResponse) {}
+}

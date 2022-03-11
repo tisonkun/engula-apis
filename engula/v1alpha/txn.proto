@@ -2,80 +2,101 @@ syntax = "proto3";
 
 package engula.v1alpha;
 
-service Txn {
-  rpc Batch(BatchTxnRequest) returns (BatchTxnResponse) {}
+message BatchTxnRequest {
+  repeated DatabaseTxnRequest selects = 1;
+  repeated DatabaseTxnRequest mutates = 2;
 }
 
-message BatchTxnRequest { repeated DatabaseTxnRequest requests = 1; }
-
-message BatchTxnResponse { repeated DatabaseTxnResponse responses = 1; }
+message BatchTxnResponse {
+  repeated DatabaseTxnResponse selects = 1;
+  repeated DatabaseTxnResponse mutates = 2;
+}
 
 message DatabaseTxnRequest {
   string name = 1;
-  repeated SelectCollectionRequest selects = 2;
-  repeated MutateCollectionRequest mutates = 3;
+  repeated CollectionTxnRequest requests = 2;
 }
 
-message DatabaseTxnResponse {
-  repeated SelectCollectionResponse selects = 1;
-  repeated MutateCollectionResponse mutates = 2;
-}
+message DatabaseTxnResponse { repeated CollectionTxnResponse responses = 1; }
 
-message SelectCollectionRequest {
+message CollectionTxnRequest {
   string name = 1;
   repeated bytes ids = 2;
-  repeated SelectExpr exprs = 3;
+  repeated TypedExpr exprs = 3;
+  // TODO: add range expressions
 }
 
-message SelectCollectionResponse { repeated ValueUnion values = 1; }
+message CollectionTxnResponse { repeated TypedValue values = 1; }
 
-message MutateCollectionRequest {
-  string name = 1;
-  repeated bytes ids = 2;
-  repeated MutateExpr exprs = 3;
-}
+// TODO:
+// - Conditions
+// - Options: TTL
 
-message MutateCollectionResponse { repeated ValueUnion values = 1; }
-
-message SelectExpr {
+message TypedExpr {
   oneof expr {
-    I64SelectExpr i64_expr = 1;
-    F64SelectExpr f64_expr = 2;
+    AnyExpr any_expr = 1;
+    I64Expr i64_expr = 2;
+    F64Expr f64_expr = 3;
+    BlobExpr blob_expr = 4;
   }
 }
 
-message MutateExpr {
-  oneof expr {
-    I64MutateExpr i64_expr = 1;
-    F64MutateExpr f64_expr = 2;
-  }
+message AnyExpr { CallExpr call = 1; }
+
+message I64Expr { CallExpr call = 1; }
+
+message F64Expr {}
+
+message BlobExpr { CallExpr call = 1; }
+
+message CallExpr {
+  Function func = 1;
+  repeated TypedValue args = 2;
+  RangeExpr range = 3;
 }
 
-message I64SelectExpr {}
-
-message I64MutateExpr { NumericCallExpr call = 1; }
-
-message F64SelectExpr {}
-
-message F64MutateExpr {}
-
-message NumericCallExpr {
-  NumericFunction func = 1;
-  repeated ValueUnion args = 2;
+message RangeExpr {
+  TypedValue start = 1;
+  RangeBound start_bound = 2;
+  TypedValue end = 3;
+  RangeBound end_bound = 4;
 }
 
-enum NumericFunction {
-  SET = 0;
-  ADD = 1;
-  SUB = 2;
+enum RangeBound {
+  Included = 0;
+  Excluded = 1;
+  Unbounded = 2;
 }
 
-message ValueUnion {
+enum Function {
+  // General
+  GET = 0;
+  SET = 1;
+  DELETE = 2;
+
+  // Numeric
+  ADD = 10;
+  SUB = 11;
+
+  // Sequence
+  POP_BACK = 30;
+  POP_FRONT = 31;
+  PUSH_BACK = 32;
+  PUSH_FRONT = 33;
+
+  // Container
+  LEN = 40;
+  INDEX = 41;
+  RANGE = 42;
+}
+
+message TypedValue {
   oneof value {
-    sint64 i64_value = 1;
-    double f64_value = 2;
-    bytes blob_value = 3;
-    string text_value = 4;
+    bytes any_value = 1;
+    sint64 i64_value = 2;
+    double f64_value = 3;
+    bytes blob_value = 4;
+    string text_value = 5;
     MapValue map_value = 8;
     ListValue set_value = 9;
     ListValue list_value = 10;
@@ -88,8 +109,9 @@ message MapValue {
 }
 
 message ListValue {
-  repeated sint64 i64_value = 1;
-  repeated double f64_value = 2;
-  repeated bytes blob_value = 3;
-  repeated string text_value = 4;
+  repeated bytes any_value = 1;
+  repeated sint64 i64_value = 2;
+  repeated double f64_value = 3;
+  repeated bytes blob_value = 4;
+  repeated string text_value = 5;
 }

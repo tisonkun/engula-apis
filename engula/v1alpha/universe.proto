@@ -2,10 +2,6 @@ syntax = "proto3";
 
 package engula.v1alpha;
 
-service Universe {
-  rpc Batch(BatchUniverseRequest) returns (BatchUniverseResponse) {}
-}
-
 message BatchUniverseRequest { repeated UniverseRequest requests = 1; }
 
 message BatchUniverseResponse { repeated UniverseResponse responses = 1; }

@@ -18,9 +18,9 @@ tonic::include_proto!("engula.v1alpha");
 
 use std::collections::HashMap;
 
-pub type Value = value_union::Value;
+pub type Value = typed_value::Value;
 
-impl<T: Into<Value>> From<T> for ValueUnion {
+impl<T: Into<Value>> From<T> for TypedValue {
     fn from(v: T) -> Self {
         Self {
             value: Some(v.into()),
@@ -28,14 +28,14 @@ impl<T: Into<Value>> From<T> for ValueUnion {
     }
 }
 
-impl From<Option<Value>> for ValueUnion {
+impl From<Option<Value>> for TypedValue {
     fn from(v: Option<Value>) -> Self {
         Self { value: v }
     }
 }
 
-impl From<ValueUnion> for Option<Value> {
-    fn from(v: ValueUnion) -> Self {
+impl From<TypedValue> for Option<Value> {
+    fn from(v: TypedValue) -> Self {
         v.value
     }
 }
@@ -46,8 +46,8 @@ impl From<Value> for () {
     }
 }
 
-impl From<ValueUnion> for () {
-    fn from(_: ValueUnion) -> Self {
+impl From<TypedValue> for () {
+    fn from(_: TypedValue) -> Self {
         ()
     }
 }
@@ -70,12 +70,12 @@ impl TryFrom<Value> for i64 {
     }
 }
 
-impl TryFrom<ValueUnion> for i64 {
-    type Error = ValueUnion;
+impl TryFrom<TypedValue> for i64 {
+    type Error = TypedValue;
 
-    fn try_from(v: ValueUnion) -> Result<Self, Self::Error> {
+    fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
         if let Some(v) = v.value {
-            v.try_into().map_err(|v| ValueUnion { value: Some(v) })
+            v.try_into().map_err(|v| TypedValue { value: Some(v) })
         } else {
             Err(v)
         }
@@ -112,7 +112,20 @@ impl From<MapValue> for Value {
     }
 }
 
-impl From<HashMap<Vec<u8>, i64>> for Value {
+impl<K, V> From<(K, V)> for MapValue
+where
+    K: Into<ListValue>,
+    V: Into<ListValue>,
+{
+    fn from((keys, values): (K, V)) -> Self {
+        Self {
+            keys: Some(keys.into()),
+            values: Some(values.into()),
+        }
+    }
+}
+
+impl From<HashMap<Vec<u8>, i64>> for MapValue {
     fn from(map: HashMap<Vec<u8>, i64>) -> Self {
         let (keys, values) = map.into_iter().fold(
             (Vec::new(), Vec::new()),
@@ -122,23 +135,19 @@ impl From<HashMap<Vec<u8>, i64>> for Value {
                 (keys, values)
             },
         );
-        MapValue {
-            keys: Some(keys.into()),
-            values: Some(values.into()),
-        }
-        .into()
+        (keys, values).into()
     }
 }
 
 impl<T: Into<ListValue>> From<T> for Value {
     fn from(v: T) -> Self {
-        Self::ListValue(v.into())
+        v.into().into()
     }
 }
 
 impl From<Vec<i64>> for ListValue {
     fn from(v: Vec<i64>) -> Self {
-        ListValue {
+        Self {
             i64_value: v,
             ..Default::default()
         }
@@ -147,21 +156,33 @@ impl From<Vec<i64>> for ListValue {
 
 impl From<Vec<Vec<u8>>> for ListValue {
     fn from(v: Vec<Vec<u8>>) -> Self {
-        ListValue {
+        Self {
             blob_value: v,
             ..Default::default()
         }
     }
 }
 
-impl From<Option<select_expr::Expr>> for SelectExpr {
-    fn from(expr: Option<select_expr::Expr>) -> Self {
-        Self { expr }
+impl From<typed_expr::Expr> for TypedExpr {
+    fn from(expr: typed_expr::Expr) -> Self {
+        Self { expr: Some(expr) }
     }
 }
 
-impl From<Option<mutate_expr::Expr>> for MutateExpr {
-    fn from(expr: Option<mutate_expr::Expr>) -> Self {
-        Self { expr }
+impl From<AnyExpr> for TypedExpr {
+    fn from(expr: AnyExpr) -> Self {
+        typed_expr::Expr::AnyExpr(expr).into()
+    }
+}
+
+impl From<I64Expr> for TypedExpr {
+    fn from(expr: I64Expr) -> Self {
+        typed_expr::Expr::I64Expr(expr).into()
+    }
+}
+
+impl From<BlobExpr> for TypedExpr {
+    fn from(expr: BlobExpr) -> Self {
+        typed_expr::Expr::BlobExpr(expr).into()
     }
 }
