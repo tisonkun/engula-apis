@@ -14,9 +14,7 @@
 
 #![allow(clippy::all)]
 
-tonic::include_proto!("engula.v1");
-
-pub mod v1;
+tonic::include_proto!("engula.v1alpha");
 
 use std::collections::HashMap;
 
@@ -42,6 +40,18 @@ impl From<ValueUnion> for Option<Value> {
     }
 }
 
+impl From<Value> for () {
+    fn from(_: Value) -> Self {
+        ()
+    }
+}
+
+impl From<ValueUnion> for () {
+    fn from(_: ValueUnion) -> Self {
+        ()
+    }
+}
+
 impl From<i64> for Value {
     fn from(v: i64) -> Self {
         Self::I64Value(v)
@@ -54,6 +64,18 @@ impl TryFrom<Value> for i64 {
     fn try_from(v: Value) -> Result<Self, Self::Error> {
         if let Value::I64Value(v) = v {
             Ok(v)
+        } else {
+            Err(v)
+        }
+    }
+}
+
+impl TryFrom<ValueUnion> for i64 {
+    type Error = ValueUnion;
+
+    fn try_from(v: ValueUnion) -> Result<Self, Self::Error> {
+        if let Some(v) = v.value {
+            v.try_into().map_err(|v| ValueUnion { value: Some(v) })
         } else {
             Err(v)
         }
@@ -90,38 +112,56 @@ impl From<MapValue> for Value {
     }
 }
 
-impl<K, V> From<HashMap<K, V>> for Value
-where
-    K: Into<Value> + Ord,
-    V: Into<Value>,
-{
-    fn from(map: HashMap<K, V>) -> Self {
+impl From<HashMap<Vec<u8>, i64>> for Value {
+    fn from(map: HashMap<Vec<u8>, i64>) -> Self {
         let (keys, values) = map.into_iter().fold(
             (Vec::new(), Vec::new()),
             |(mut keys, mut values), (k, v)| {
-                keys.push(k.into().into());
-                values.push(v.into().into());
+                keys.push(k);
+                values.push(v);
                 (keys, values)
             },
         );
-        MapValue { keys, values }.into()
-    }
-}
-
-impl From<ListValue> for Value {
-    fn from(v: ListValue) -> Self {
-        Self::ListValue(v)
-    }
-}
-
-impl<T> From<Vec<T>> for Value
-where
-    T: Into<Value>,
-{
-    fn from(values: Vec<T>) -> Self {
-        ListValue {
-            values: values.into_iter().map(|v| v.into().into()).collect(),
+        MapValue {
+            keys: Some(keys.into()),
+            values: Some(values.into()),
         }
         .into()
+    }
+}
+
+impl<T: Into<ListValue>> From<T> for Value {
+    fn from(v: T) -> Self {
+        Self::ListValue(v.into())
+    }
+}
+
+impl From<Vec<i64>> for ListValue {
+    fn from(v: Vec<i64>) -> Self {
+        ListValue {
+            i64_value: v,
+            ..Default::default()
+        }
+    }
+}
+
+impl From<Vec<Vec<u8>>> for ListValue {
+    fn from(v: Vec<Vec<u8>>) -> Self {
+        ListValue {
+            blob_value: v,
+            ..Default::default()
+        }
+    }
+}
+
+impl From<Option<select_expr::Expr>> for SelectExpr {
+    fn from(expr: Option<select_expr::Expr>) -> Self {
+        Self { expr }
+    }
+}
+
+impl From<Option<mutate_expr::Expr>> for MutateExpr {
+    fn from(expr: Option<mutate_expr::Expr>) -> Self {
+        Self { expr }
     }
 }

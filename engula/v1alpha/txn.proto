@@ -6,41 +6,69 @@ service Txn {
   rpc Batch(BatchTxnRequest) returns (BatchTxnResponse) {}
 }
 
-message BatchTxnRequest {
-  repeated SelectDatabaseRequest selects = 1;
-  repeated MutateDatabaseRequest mutates = 2;
-}
+message BatchTxnRequest { repeated DatabaseTxnRequest requests = 1; }
 
-message BatchTxnResponse {
-  repeated SelectDatabaseResponse selects = 1;
-  repeated MutateDatabaseResponse mutates = 2;
-}
+message BatchTxnResponse { repeated DatabaseTxnResponse responses = 1; }
 
-message SelectDatabaseRequest {
+message DatabaseTxnRequest {
   string name = 1;
-  repeated SelectCollectionRequest requests = 2;
+  repeated SelectCollectionRequest selects = 2;
+  repeated MutateCollectionRequest mutates = 3;
 }
 
-message SelectDatabaseResponse {
-  repeated SelectCollectionResponse responses = 1;
+message DatabaseTxnResponse {
+  repeated SelectCollectionResponse selects = 1;
+  repeated MutateCollectionResponse mutates = 2;
 }
 
-message SelectCollectionRequest { string name = 1; }
+message SelectCollectionRequest {
+  string name = 1;
+  repeated bytes ids = 2;
+  repeated SelectExpr exprs = 3;
+}
 
 message SelectCollectionResponse { repeated ValueUnion values = 1; }
 
-message MutateDatabaseRequest {
+message MutateCollectionRequest {
   string name = 1;
-  repeated MutateCollectionRequest requests = 2;
+  repeated bytes ids = 2;
+  repeated MutateExpr exprs = 3;
 }
-
-message MutateDatabaseResponse {
-  repeated MutateCollectionResponse responses = 1;
-}
-
-message MutateCollectionRequest { string name = 1; }
 
 message MutateCollectionResponse { repeated ValueUnion values = 1; }
+
+message SelectExpr {
+  oneof expr {
+    I64SelectExpr i64_expr = 1;
+    F64SelectExpr f64_expr = 2;
+  }
+}
+
+message MutateExpr {
+  oneof expr {
+    I64MutateExpr i64_expr = 1;
+    F64MutateExpr f64_expr = 2;
+  }
+}
+
+message I64SelectExpr {}
+
+message I64MutateExpr { NumericCallExpr call = 1; }
+
+message F64SelectExpr {}
+
+message F64MutateExpr {}
+
+message NumericCallExpr {
+  NumericFunction func = 1;
+  repeated ValueUnion args = 2;
+}
+
+enum NumericFunction {
+  SET = 0;
+  ADD = 1;
+  SUB = 2;
+}
 
 message ValueUnion {
   oneof value {
@@ -48,15 +76,20 @@ message ValueUnion {
     double f64_value = 2;
     bytes blob_value = 3;
     string text_value = 4;
-    MapValue map_value = 10;
-    MapValue set_value = 11;
-    ListValue list_value = 12;
+    MapValue map_value = 8;
+    ListValue set_value = 9;
+    ListValue list_value = 10;
   }
 }
 
 message MapValue {
-  repeated ValueUnion keys = 1;
-  repeated ValueUnion values = 2;
+  ListValue keys = 1;
+  ListValue values = 2;
 }
 
-message ListValue { repeated ValueUnion values = 1; }
+message ListValue {
+  repeated sint64 i64_value = 1;
+  repeated double f64_value = 2;
+  repeated bytes blob_value = 3;
+  repeated string text_value = 4;
+}
