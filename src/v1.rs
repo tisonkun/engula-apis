@@ -21,6 +21,8 @@ use std::{
     ops::{Bound, RangeBounds},
 };
 
+use prost::Message;
+
 pub type Value = typed_value::Value;
 
 impl From<TypedValue> for Option<Value> {
@@ -183,11 +185,67 @@ impl From<Vec<i64>> for ListValue {
     }
 }
 
+impl TryFrom<Value> for Vec<i64> {
+    type Error = Value;
+
+    fn try_from(v: Value) -> Result<Self, Self::Error> {
+        if let Value::ListValue(v) = v {
+            if !v.i64_value.is_empty() || v.encoded_len() == 0 {
+                Ok(v.i64_value)
+            } else {
+                Err(Value::ListValue(v))
+            }
+        } else {
+            Err(v)
+        }
+    }
+}
+
+impl TryFrom<TypedValue> for Vec<i64> {
+    type Error = TypedValue;
+
+    fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
+        if let Some(v) = v.value {
+            v.try_into().map_err(|v| TypedValue { value: Some(v) })
+        } else {
+            Err(v)
+        }
+    }
+}
+
 impl From<Vec<Vec<u8>>> for ListValue {
     fn from(v: Vec<Vec<u8>>) -> Self {
         Self {
             blob_value: v,
             ..Default::default()
+        }
+    }
+}
+
+impl TryFrom<Value> for Vec<Vec<u8>> {
+    type Error = Value;
+
+    fn try_from(v: Value) -> Result<Self, Self::Error> {
+        if let Value::ListValue(v) = v {
+            if !v.blob_value.is_empty() || v.encoded_len() == 0 {
+                Ok(v.blob_value)
+            } else {
+                Err(Value::ListValue(v))
+            }
+        } else {
+            Err(v)
+        }
+    }
+}
+
+impl TryFrom<TypedValue> for Vec<Vec<u8>> {
+    type Error = TypedValue;
+
+    fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
+        if let Some(v) = v.value {
+            v.try_into().map_err(|v| TypedValue { value: Some(v) })
+        } else {
+            Err(v)
         }
     }
 }
@@ -213,6 +271,12 @@ impl From<I64Expr> for TypedExpr {
 impl From<BlobExpr> for TypedExpr {
     fn from(expr: BlobExpr) -> Self {
         typed_expr::Expr::BlobExpr(expr).into()
+    }
+}
+
+impl From<ListExpr> for TypedExpr {
+    fn from(expr: ListExpr) -> Self {
+        typed_expr::Expr::ListExpr(expr).into()
     }
 }
 
