@@ -16,9 +16,18 @@
 
 tonic::include_proto!("engula.v1alpha");
 
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    ops::{Bound, RangeBounds},
+};
 
 pub type Value = typed_value::Value;
+
+impl From<TypedValue> for Option<Value> {
+    fn from(v: TypedValue) -> Self {
+        v.value
+    }
+}
 
 impl<T: Into<Value>> From<T> for TypedValue {
     fn from(v: T) -> Self {
@@ -28,15 +37,11 @@ impl<T: Into<Value>> From<T> for TypedValue {
     }
 }
 
-impl From<Option<Value>> for TypedValue {
-    fn from(v: Option<Value>) -> Self {
-        Self { value: v }
-    }
-}
-
-impl From<TypedValue> for Option<Value> {
-    fn from(v: TypedValue) -> Self {
-        v.value
+impl<T: Into<Value>> From<Option<T>> for TypedValue {
+    fn from(v: Option<T>) -> Self {
+        Self {
+            value: v.map(|v| v.into()),
+        }
     }
 }
 
@@ -94,6 +99,30 @@ impl From<Vec<u8>> for Value {
     }
 }
 
+impl TryFrom<Value> for Vec<u8> {
+    type Error = Value;
+
+    fn try_from(v: Value) -> Result<Self, Self::Error> {
+        if let Value::BlobValue(v) = v {
+            Ok(v)
+        } else {
+            Err(v)
+        }
+    }
+}
+
+impl TryFrom<TypedValue> for Vec<u8> {
+    type Error = TypedValue;
+
+    fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
+        if let Some(v) = v.value {
+            v.try_into().map_err(|v| TypedValue { value: Some(v) })
+        } else {
+            Err(v)
+        }
+    }
+}
+
 impl From<&str> for Value {
     fn from(v: &str) -> Self {
         Self::TextValue(v.to_owned())
@@ -139,9 +168,9 @@ impl From<HashMap<Vec<u8>, i64>> for MapValue {
     }
 }
 
-impl<T: Into<ListValue>> From<T> for Value {
-    fn from(v: T) -> Self {
-        v.into().into()
+impl From<ListValue> for Value {
+    fn from(v: ListValue) -> Self {
+        Value::ListValue(v)
     }
 }
 
@@ -184,5 +213,38 @@ impl From<I64Expr> for TypedExpr {
 impl From<BlobExpr> for TypedExpr {
     fn from(expr: BlobExpr) -> Self {
         typed_expr::Expr::BlobExpr(expr).into()
+    }
+}
+
+impl<R: RangeBounds<i64>> From<R> for RangeExpr {
+    fn from(range: R) -> Self {
+        let mut expr = Self::default();
+        match range.start_bound() {
+            Bound::Included(start) => {
+                expr.start = Some(start.to_owned().into());
+                expr.start_bound = RangeBound::Included as i32;
+            }
+            Bound::Excluded(end) => {
+                expr.start = Some(end.to_owned().into());
+                expr.start_bound = RangeBound::Excluded as i32;
+            }
+            Bound::Unbounded => {
+                expr.start_bound = RangeBound::Unbounded as i32;
+            }
+        }
+        match range.end_bound() {
+            Bound::Included(end) => {
+                expr.end = Some(end.to_owned().into());
+                expr.end_bound = RangeBound::Included as i32;
+            }
+            Bound::Excluded(end) => {
+                expr.end = Some(end.to_owned().into());
+                expr.end_bound = RangeBound::Excluded as i32;
+            }
+            Bound::Unbounded => {
+                expr.end_bound = RangeBound::Unbounded as i32;
+            }
+        }
+        expr
     }
 }
