@@ -16,6 +16,10 @@
 
 tonic::include_proto!("engula.v1");
 
+mod blob;
+mod i64;
+mod list;
+mod map;
 pub mod v1;
 
 use std::collections::HashMap;

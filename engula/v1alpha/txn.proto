@@ -23,56 +23,14 @@ message CollectionTxnRequest {
   string name = 1;
   repeated bytes ids = 2;
   repeated TypedExpr exprs = 3;
-  // TODO: add range expressions
 }
 
 message CollectionTxnResponse { repeated TypedValue values = 1; }
 
 // TODO:
-// - Conditions
 // - Options: TTL
-
-message TypedExpr {
-  oneof expr {
-    AnyExpr any_expr = 1;
-    I64Expr i64_expr = 2;
-    // F64Expr f64_expr = 3;
-    BlobExpr blob_expr = 4;
-    // TextExpr text_expr = 5;
-    // MapExpr map_expr = 8;
-    // SetExpr set_expr = 9;
-    ListExpr list_expr = 10;
-  }
-}
-
-message AnyExpr { CallExpr call = 1; }
-
-message I64Expr { CallExpr call = 1; }
-
-// message F64Expr {}
-
-message BlobExpr { CallExpr call = 1; }
-
-message ListExpr { CallExpr call = 1; }
-
-message CallExpr {
-  Function func = 1;
-  repeated TypedValue args = 2;
-  RangeExpr range = 3;
-}
-
-message RangeExpr {
-  TypedValue start = 1;
-  RangeBound start_bound = 2;
-  TypedValue end = 3;
-  RangeBound end_bound = 4;
-}
-
-enum RangeBound {
-  Included = 0;
-  Excluded = 1;
-  Unbounded = 2;
-}
+// - Range expressions
+// - Conditional expressions
 
 enum Function {
   // General
@@ -92,8 +50,46 @@ enum Function {
 
   // Container
   LEN = 40;
-  INDEX = 41;
-  RANGE = 42;
+  EXTEND = 41;
+}
+
+message AnyExpr { CallExpr call = 1; }
+
+message I64Expr { CallExpr call = 1; }
+
+message F64Expr { CallExpr call = 1; }
+
+message BlobExpr { CallExpr call = 1; }
+
+message TextExpr { CallExpr call = 1; }
+
+message MapExpr { CallExpr call = 1; }
+
+message SetExpr { CallExpr call = 1; }
+
+message ListExpr { CallExpr call = 1; }
+
+message CallExpr {
+  Function func = 1;
+  repeated TypedValue args = 2;
+
+  oneof operand {
+    TypedValue index = 3;
+    TypedRange range = 4;
+  }
+}
+
+message TypedExpr {
+  oneof expr {
+    AnyExpr any_expr = 1;
+    I64Expr i64_expr = 2;
+    F64Expr f64_expr = 3;
+    BlobExpr blob_expr = 4;
+    TextExpr text_expr = 5;
+    MapExpr map_expr = 8;
+    SetExpr set_expr = 9;
+    ListExpr list_expr = 10;
+  }
 }
 
 message TypedValue {
@@ -120,4 +116,17 @@ message ListValue {
   repeated double f64_value = 3;
   repeated bytes blob_value = 4;
   repeated string text_value = 5;
+}
+
+enum RangeBound {
+  Included = 0;
+  Excluded = 1;
+  Unbounded = 2;
+}
+
+message TypedRange {
+  TypedValue start = 1;
+  RangeBound start_bound = 2;
+  TypedValue end = 3;
+  RangeBound end_bound = 4;
 }
