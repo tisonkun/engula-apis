@@ -37,10 +37,11 @@ enum Function {
   SUB = 11;
 
   // Sequence
-  POP_BACK = 30;
-  POP_FRONT = 31;
-  PUSH_BACK = 32;
-  PUSH_FRONT = 33;
+  TRIM = 30;
+  LPOP = 31;
+  RPOP = 32;
+  LPUSH = 33;
+  RPUSH = 34;
 
   // Container
   LEN = 40;
