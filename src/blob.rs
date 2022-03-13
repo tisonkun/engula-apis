@@ -34,7 +34,7 @@ impl<const N: usize> From<[u8; N]> for Value {
 
 impl From<Vec<u8>> for Value {
     fn from(v: Vec<u8>) -> Self {
-        Value::BlobValue(v)
+        Self::BlobValue(v)
     }
 }
 

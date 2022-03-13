@@ -2,10 +2,6 @@ syntax = "proto3";
 
 package engula.v1alpha;
 
-message BatchUniverseRequest { repeated UniverseRequest requests = 1; }
-
-message BatchUniverseResponse { repeated UniverseResponse responses = 1; }
-
 message UniverseRequest {
   oneof request {
     ListDatabasesRequest list_databases = 1;

@@ -74,7 +74,7 @@ macro_rules! impl_list {
 
             fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
                 if let Some(Value::ListValue(v)) = v.value {
-                    v.try_into().map_err(|v| Value::ListValue(v).into())
+                    v.try_into().map_err(|v: ListValue| v.into())
                 } else {
                     Err(v)
                 }
@@ -87,9 +87,7 @@ macro_rules! impl_list {
             fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
                 if let Some(v) = v.value {
                     if let Value::ListValue(v) = v {
-                        v.try_into()
-                            .map(Some)
-                            .map_err(|v| Value::ListValue(v).into())
+                        v.try_into().map(Some).map_err(|v: ListValue| v.into())
                     } else {
                         Err(v.into())
                     }
@@ -102,4 +100,6 @@ macro_rules! impl_list {
 }
 
 impl_list!(i64, i64_value);
+impl_list!(f64, f64_value);
 impl_list!(Vec<u8>, blob_value);
+impl_list!(String, text_value);

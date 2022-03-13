@@ -14,23 +14,17 @@
 
 use crate::v1::*;
 
-impl From<&str> for Value {
-    fn from(v: &str) -> Self {
-        Value::TextValue(v.to_owned())
+impl From<f64> for Value {
+    fn from(v: f64) -> Self {
+        Self::F64Value(v)
     }
 }
 
-impl From<String> for Value {
-    fn from(v: String) -> Self {
-        Value::TextValue(v)
-    }
-}
-
-impl TryFrom<TypedValue> for String {
+impl TryFrom<TypedValue> for f64 {
     type Error = TypedValue;
 
     fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
-        if let Some(Value::TextValue(v)) = v.value {
+        if let Some(Value::F64Value(v)) = v.value {
             Ok(v)
         } else {
             Err(v)
@@ -38,12 +32,12 @@ impl TryFrom<TypedValue> for String {
     }
 }
 
-impl TryFrom<TypedValue> for Option<String> {
+impl TryFrom<TypedValue> for Option<f64> {
     type Error = TypedValue;
 
     fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
         if let Some(v) = v.value {
-            if let Value::TextValue(v) = v {
+            if let Value::F64Value(v) = v {
                 Ok(Some(v))
             } else {
                 Err(v.into())

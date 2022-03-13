@@ -2,11 +2,19 @@ syntax = "proto3";
 
 package engula.v1alpha;
 
-import "engula/v1alpha/txn.proto";
+import "engula/v1alpha/database.proto";
 import "engula/v1alpha/universe.proto";
 
 service Engula {
-  rpc Txn(BatchTxnRequest) returns (BatchTxnResponse) {}
+  rpc Batch(BatchRequest) returns (BatchResponse) {}
+}
 
-  rpc Universe(BatchUniverseRequest) returns (BatchUniverseResponse) {}
+message BatchRequest {
+  repeated DatabaseRequest databases = 1;
+  repeated UniverseRequest universes = 2;
+}
+
+message BatchResponse {
+  repeated DatabaseResponse databases = 1;
+  repeated UniverseResponse universes = 2;
 }

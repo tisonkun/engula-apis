@@ -16,7 +16,7 @@ use crate::v1::*;
 
 impl From<i64> for Value {
     fn from(v: i64) -> Self {
-        Value::I64Value(v)
+        Self::I64Value(v)
     }
 }
 

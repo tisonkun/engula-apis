@@ -18,7 +18,7 @@ use crate::v1::*;
 
 impl From<MapValue> for Value {
     fn from(v: MapValue) -> Self {
-        Value::MapValue(v)
+        Self::MapValue(v)
     }
 }
 
@@ -49,46 +49,48 @@ macro_rules! impl_map {
             }
         }
 
+        impl TryFrom<MapValue> for $map_type {
+            type Error = MapValue;
+
+            fn try_from(v: MapValue) -> Result<Self, Self::Error> {
+                match (v.keys, v.values) {
+                    (Some(keys), Some(values)) => {
+                        let keys: Result<Vec<$key_type>, _> = keys.try_into();
+                        let values: Result<Vec<$value_type>, _> = values.try_into();
+                        match (keys, values) {
+                            (Ok(keys), Ok(values)) => {
+                                if keys.len() == values.len() {
+                                    Ok(keys.into_iter().zip(values.into_iter()).collect())
+                                } else {
+                                    Err((keys, values).into())
+                                }
+                            }
+                            (Ok(keys), Err(values)) => Err((keys, values).into()),
+                            (Err(keys), Ok(values)) => Err((keys, values).into()),
+                            (Err(keys), Err(values)) => Err((keys, values).into()),
+                        }
+                    }
+                    (Some(keys), None) => Err(MapValue {
+                        keys: Some(keys),
+                        values: None,
+                    }
+                    .into()),
+                    (None, Some(values)) => Err(MapValue {
+                        keys: None,
+                        values: Some(values),
+                    }
+                    .into()),
+                    (None, None) => Err(MapValue::default().into()),
+                }
+            }
+        }
+
         impl TryFrom<Value> for $map_type {
             type Error = Value;
 
             fn try_from(v: Value) -> Result<Self, Self::Error> {
                 if let Value::MapValue(v) = v {
-                    match (v.keys, v.values) {
-                        (Some(keys), Some(values)) => {
-                            let keys: Result<Vec<$key_type>, _> = keys.try_into();
-                            let values: Result<Vec<$value_type>, _> = values.try_into();
-                            match (keys, values) {
-                                (Ok(keys), Ok(values)) => {
-                                    if keys.len() == values.len() {
-                                        Ok(keys.into_iter().zip(values.into_iter()).collect())
-                                    } else {
-                                        Err(Value::MapValue((keys, values).into()))
-                                    }
-                                }
-                                (Ok(keys), Err(values)) => {
-                                    Err(Value::MapValue((keys, values).into()))
-                                }
-                                (Err(keys), Ok(values)) => {
-                                    Err(Value::MapValue((keys, values).into()))
-                                }
-                                (Err(keys), Err(values)) => {
-                                    Err(Value::MapValue((keys, values).into()))
-                                }
-                            }
-                        }
-                        (Some(keys), None) => Err(MapValue {
-                            keys: Some(keys),
-                            values: None,
-                        }
-                        .into()),
-                        (None, Some(values)) => Err(MapValue {
-                            keys: None,
-                            values: Some(values),
-                        }
-                        .into()),
-                        (None, None) => Err(MapValue::default().into()),
-                    }
+                    v.try_into().map_err(|v: MapValue| v.into())
                 } else {
                     Err(v)
                 }
@@ -100,7 +102,7 @@ macro_rules! impl_map {
 
             fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
                 if let Some(v) = v.value {
-                    v.try_into().map_err(|v| TypedValue { value: Some(v) })
+                    v.try_into().map_err(|v: Value| v.into())
                 } else {
                     Err(v)
                 }
@@ -112,9 +114,7 @@ macro_rules! impl_map {
 
             fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
                 if let Some(v) = v.value {
-                    v.try_into()
-                        .map(Some)
-                        .map_err(|v| TypedValue { value: Some(v) })
+                    v.try_into().map(Some).map_err(|v: Value| v.into())
                 } else {
                     Ok(None)
                 }
@@ -123,7 +123,7 @@ macro_rules! impl_map {
     };
 }
 
-macro_rules! impl_pair {
+macro_rules! impl_maps {
     ($key_type:ty, $value_type:ty) => {
         impl_map!(HashMap<$key_type, $value_type>, $key_type, $value_type);
         impl_map!(BTreeMap<$key_type, $value_type>, $key_type, $value_type);
@@ -136,7 +136,12 @@ macro_rules! impl_pair {
     }
 }
 
-impl_pair!(i64, i64);
-impl_pair!(i64, Vec<u8>);
-impl_pair!(Vec<u8>, i64);
-impl_pair!(Vec<u8>, Vec<u8>);
+impl_maps!(i64, i64);
+impl_maps!(i64, Vec<u8>);
+impl_maps!(i64, String);
+impl_maps!(Vec<u8>, i64);
+impl_maps!(Vec<u8>, Vec<u8>);
+impl_maps!(Vec<u8>, String);
+impl_maps!(String, i64);
+impl_maps!(String, Vec<u8>);
+impl_maps!(String, String);

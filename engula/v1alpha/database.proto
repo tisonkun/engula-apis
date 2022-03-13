@@ -2,30 +2,24 @@ syntax = "proto3";
 
 package engula.v1alpha;
 
-message BatchTxnRequest {
-  repeated DatabaseTxnRequest selects = 1;
-  repeated DatabaseTxnRequest mutates = 2;
-}
-
-message BatchTxnResponse {
-  repeated DatabaseTxnResponse selects = 1;
-  repeated DatabaseTxnResponse mutates = 2;
-}
-
-message DatabaseTxnRequest {
+message DatabaseRequest {
   string name = 1;
-  repeated CollectionTxnRequest requests = 2;
+  repeated CollectionRequest selects = 2;
+  repeated CollectionRequest mutates = 3;
 }
 
-message DatabaseTxnResponse { repeated CollectionTxnResponse responses = 1; }
+message DatabaseResponse {
+  repeated CollectionResponse selects = 1;
+  repeated CollectionResponse mutates = 2;
+}
 
-message CollectionTxnRequest {
+message CollectionRequest {
   string name = 1;
   repeated bytes ids = 2;
   repeated TypedExpr exprs = 3;
 }
 
-message CollectionTxnResponse { repeated TypedValue values = 1; }
+message CollectionResponse { repeated TypedValue values = 1; }
 
 // TODO:
 // - Options: TTL
@@ -100,7 +94,7 @@ message TypedValue {
     bytes blob_value = 4;
     string text_value = 5;
     MapValue map_value = 8;
-    ListValue set_value = 9;
+    SetValue set_value = 9;
     ListValue list_value = 10;
   }
 }
@@ -109,6 +103,8 @@ message MapValue {
   ListValue keys = 1;
   ListValue values = 2;
 }
+
+message SetValue { ListValue keys = 1; }
 
 message ListValue {
   repeated bytes any_value = 1;
