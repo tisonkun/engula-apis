@@ -137,11 +137,14 @@ macro_rules! impl_maps {
 }
 
 impl_maps!(i64, i64);
+impl_maps!(i64, bool);
 impl_maps!(i64, Vec<u8>);
 impl_maps!(i64, String);
 impl_maps!(Vec<u8>, i64);
+impl_maps!(Vec<u8>, bool);
 impl_maps!(Vec<u8>, Vec<u8>);
 impl_maps!(Vec<u8>, String);
 impl_maps!(String, i64);
+impl_maps!(String, bool);
 impl_maps!(String, Vec<u8>);
 impl_maps!(String, String);

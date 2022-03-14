@@ -22,6 +22,27 @@ impl From<ListValue> for Value {
     }
 }
 
+impl From<Vec<bool>> for ListValue {
+    fn from(v: Vec<bool>) -> Self {
+        Self {
+            i64_value: v.into_iter().map(|v| v as i64).collect(),
+            ..Default::default()
+        }
+    }
+}
+
+impl TryFrom<ListValue> for Vec<bool> {
+    type Error = ListValue;
+
+    fn try_from(v: ListValue) -> Result<Self, Self::Error> {
+        if !v.i64_value.is_empty() || v.encoded_len() == 0 {
+            Ok(v.i64_value.into_iter().map(|v| v != 0).collect())
+        } else {
+            Err(v)
+        }
+    }
+}
+
 macro_rules! impl_list {
     ($rust_type:ty, $list_value:ident) => {
         impl From<$rust_type> for ListValue {
