@@ -21,6 +21,7 @@ mod f64;
 mod i64;
 mod list;
 mod map;
+mod range;
 mod set;
 mod text;
 mod typed_expr;

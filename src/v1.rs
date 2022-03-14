@@ -16,12 +16,20 @@
 
 tonic::include_proto!("engula.v1alpha");
 
+pub use crate::range::range_value;
+
 pub type Expr = typed_expr::Expr;
 pub type Value = typed_value::Value;
 
 impl From<TypedValue> for () {
     fn from(_: TypedValue) -> Self {
         ()
+    }
+}
+
+impl From<TypedValue> for bool {
+    fn from(v: TypedValue) -> Self {
+        v.value.is_some()
     }
 }
 
