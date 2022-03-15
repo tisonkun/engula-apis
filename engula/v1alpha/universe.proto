@@ -119,10 +119,8 @@ message DatabaseProperties { uint64 num_collections = 1; }
 message CollectionDesc {
   uint64 id = 1;
   string name = 2;
-  uint64 database_id = 3;
-  string database_name = 4;
-  CollectionOptions options = 5;
-  CollectionProperties properties = 6;
+  CollectionOptions options = 3;
+  CollectionProperties properties = 4;
 }
 
 message CollectionOptions {}
