@@ -129,15 +129,18 @@ message ListValue {
   repeated string text_value = 4;
 }
 
-enum RangeBound {
-  INCLUDED = 0;
-  EXCLUDED = 1;
-  UNBOUNDED = 2;
+message RangeBound {
+  oneof value {
+    sint64 i64_value = 1;
+    double f64_value = 2;
+    bytes blob_value = 3;
+    string text_value = 4;
+  }
+
+  bool included = 15;
 }
 
 message RangeValue {
-  bytes start = 1;
-  RangeBound start_bound = 2;
-  bytes end = 3;
-  RangeBound end_bound = 4;
+  RangeBound start = 1;
+  RangeBound end = 2;
 }

@@ -27,6 +27,18 @@ impl From<TypedValue> for () {
     }
 }
 
+impl From<()> for TypedValue {
+    fn from(_: ()) -> Self {
+        Self::default()
+    }
+}
+
+impl From<bool> for TypedValue {
+    fn from(v: bool) -> Self {
+        if v { Some(Value::I64Value(1)) } else { None }.into()
+    }
+}
+
 impl From<TypedValue> for bool {
     fn from(v: TypedValue) -> Self {
         v.value.is_some()
