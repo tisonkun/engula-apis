@@ -20,6 +20,12 @@ impl From<i64> for Value {
     }
 }
 
+impl From<bool> for Value {
+    fn from(v: bool) -> Self {
+        Self::I64Value(v as i64)
+    }
+}
+
 impl TryFrom<TypedValue> for i64 {
     type Error = TypedValue;
 
