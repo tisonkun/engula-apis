@@ -14,9 +14,19 @@
 
 #![allow(clippy::all)]
 
-tonic::include_proto!("engula.v1alpha");
+mod blob;
+mod bool;
+mod expr;
+mod list;
+mod map;
+mod range;
+mod set;
+mod text;
+mod value;
 
-pub use crate::range::range_bounds;
+tonic::include_proto!("engula.v1");
 
 pub type Expr = typed_expr::Expr;
 pub type Value = typed_value::Value;
+
+pub use self::range::range_bounds;

@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 
-package engula.v1alpha;
+package engula.v1;
 
 message UniverseRequest {
   oneof request {
