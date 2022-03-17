@@ -55,6 +55,18 @@ macro_rules! impl_type {
             }
         }
 
+        impl TryFrom<Value> for $rust_type {
+            type Error = Value;
+
+            fn try_from(v: Value) -> Result<Self, Self::Error> {
+                if let $value_type(v) = v {
+                    Ok(v)
+                } else {
+                    Err(v)
+                }
+            }
+        }
+
         impl TryFrom<TypedValue> for $rust_type {
             type Error = TypedValue;
 
@@ -81,47 +93,11 @@ macro_rules! impl_type {
     };
 }
 
-macro_rules! impl_simple_type {
-    ($rust_type:ty, $value_type:path) => {
-        impl_type!($rust_type, $value_type);
-
-        impl TryFrom<Value> for $rust_type {
-            type Error = Value;
-
-            fn try_from(v: Value) -> Result<Self, Self::Error> {
-                match v {
-                    $value_type(v) => Ok(v),
-                    Value::ListValue(v) => v.try_into().map_err(|v| Value::from(v)),
-                    _ => Err(v),
-                }
-            }
-        }
-    };
-}
-
-macro_rules! impl_complex_type {
-    ($rust_type:ty, $value_type:path) => {
-        impl_type!($rust_type, $value_type);
-
-        impl TryFrom<Value> for $rust_type {
-            type Error = Value;
-
-            fn try_from(v: Value) -> Result<Self, Self::Error> {
-                if let $value_type(v) = v {
-                    Ok(v)
-                } else {
-                    Err(v)
-                }
-            }
-        }
-    };
-}
-
-impl_simple_type!(i64, Value::I64Value);
-impl_simple_type!(f64, Value::F64Value);
-impl_simple_type!(Vec<u8>, Value::BlobValue);
-impl_simple_type!(String, Value::TextValue);
-impl_complex_type!(MapValue, Value::MapValue);
-impl_complex_type!(SetValue, Value::SetValue);
-impl_complex_type!(ListValue, Value::ListValue);
-impl_complex_type!(RangeValue, Value::RangeValue);
+impl_type!(i64, Value::I64Value);
+impl_type!(f64, Value::F64Value);
+impl_type!(Vec<u8>, Value::BlobValue);
+impl_type!(String, Value::TextValue);
+impl_type!(MapValue, Value::MapValue);
+impl_type!(SetValue, Value::SetValue);
+impl_type!(ListValue, Value::ListValue);
+impl_type!(RangeValue, Value::RangeValue);

@@ -36,6 +36,20 @@ macro_rules! impl_list_type {
             }
         }
 
+        impl TryFrom<ListValue> for Option<$rust_type> {
+            type Error = ListValue;
+
+            fn try_from(mut v: ListValue) -> Result<Self, Self::Error> {
+                if v.$list_value.is_empty() && v.encoded_len() == 0 {
+                    Ok(None)
+                } else if v.$list_value.len() == 1 {
+                    Ok(v.$list_value.pop())
+                } else {
+                    Err(v)
+                }
+            }
+        }
+
         impl From<&'_ [$rust_type]> for ListValue {
             fn from(v: &'_ [$rust_type]) -> Self {
                 Vec::from(v).into()

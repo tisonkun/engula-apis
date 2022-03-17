@@ -29,6 +29,25 @@ where
     }
 }
 
+impl TryFrom<MapValue> for (ListValue, ListValue) {
+    type Error = MapValue;
+
+    fn try_from(v: MapValue) -> Result<Self, Self::Error> {
+        match (v.keys, v.values) {
+            (Some(keys), Some(values)) => Ok((keys, values)),
+            (Some(keys), None) => Err(MapValue {
+                keys: Some(keys),
+                values: None,
+            }),
+            (None, Some(values)) => Err(MapValue {
+                keys: None,
+                values: Some(values),
+            }),
+            (None, None) => Err(MapValue::default()),
+        }
+    }
+}
+
 macro_rules! impl_map {
     ($map_type:ty, $key_type:ty, $value_type:ty) => {
         impl From<$map_type> for MapValue {
