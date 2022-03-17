@@ -16,38 +16,23 @@ use prost::Message;
 
 use crate::v1::*;
 
-impl From<ListValue> for Value {
-    fn from(v: ListValue) -> Self {
-        Value::ListValue(v)
-    }
-}
-
-impl From<Vec<bool>> for ListValue {
-    fn from(v: Vec<bool>) -> Self {
-        Self {
-            i64_value: v.into_iter().map(|v| v as i64).collect(),
-            ..Default::default()
-        }
-    }
-}
-
-impl TryFrom<ListValue> for Vec<bool> {
-    type Error = ListValue;
-
-    fn try_from(v: ListValue) -> Result<Self, Self::Error> {
-        if !v.i64_value.is_empty() || v.encoded_len() == 0 {
-            Ok(v.i64_value.into_iter().map(|v| v != 0).collect())
-        } else {
-            Err(v)
-        }
-    }
-}
-
-macro_rules! impl_list {
+macro_rules! impl_list_type {
     ($rust_type:ty, $list_value:ident) => {
         impl From<$rust_type> for ListValue {
             fn from(v: $rust_type) -> Self {
                 vec![v].into()
+            }
+        }
+
+        impl TryFrom<ListValue> for $rust_type {
+            type Error = ListValue;
+
+            fn try_from(mut v: ListValue) -> Result<Self, Self::Error> {
+                if v.$list_value.len() == 1 {
+                    Ok(v.$list_value.swap_remove(0))
+                } else {
+                    Err(v)
+                }
             }
         }
 
@@ -90,12 +75,30 @@ macro_rules! impl_list {
             }
         }
 
+        impl From<Vec<$rust_type>> for Value {
+            fn from(v: Vec<$rust_type>) -> Self {
+                Self::ListValue(v.into())
+            }
+        }
+
+        impl TryFrom<Value> for Vec<$rust_type> {
+            type Error = Value;
+
+            fn try_from(v: Value) -> Result<Self, Self::Error> {
+                if let Value::ListValue(v) = v {
+                    v.try_into().map_err(|v| Value::from(v))
+                } else {
+                    Err(v)
+                }
+            }
+        }
+
         impl TryFrom<TypedValue> for Vec<$rust_type> {
             type Error = TypedValue;
 
             fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
                 if let Some(Value::ListValue(v)) = v.value {
-                    v.try_into().map_err(|v: ListValue| v.into())
+                    v.try_into().map_err(|v| TypedValue::from(v))
                 } else {
                     Err(v)
                 }
@@ -108,7 +111,7 @@ macro_rules! impl_list {
             fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
                 if let Some(v) = v.value {
                     if let Value::ListValue(v) = v {
-                        v.try_into().map(Some).map_err(|v: ListValue| v.into())
+                        v.try_into().map(Some).map_err(|v| TypedValue::from(v))
                     } else {
                         Err(v.into())
                     }
@@ -120,7 +123,7 @@ macro_rules! impl_list {
     };
 }
 
-impl_list!(i64, i64_value);
-impl_list!(f64, f64_value);
-impl_list!(Vec<u8>, blob_value);
-impl_list!(String, text_value);
+impl_list_type!(i64, i64_value);
+impl_list_type!(f64, f64_value);
+impl_list_type!(Vec<u8>, blob_value);
+impl_list_type!(String, text_value);

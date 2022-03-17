@@ -16,40 +16,6 @@ use std::ops::{Bound, RangeBounds};
 
 use crate::v1::*;
 
-impl From<RangeValue> for Value {
-    fn from(v: RangeValue) -> Self {
-        Self::RangeValue(v)
-    }
-}
-
-impl TryFrom<TypedValue> for RangeValue {
-    type Error = TypedValue;
-
-    fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
-        if let Some(Value::RangeValue(v)) = v.value {
-            Ok(v)
-        } else {
-            Err(v)
-        }
-    }
-}
-
-impl TryFrom<TypedValue> for Option<RangeValue> {
-    type Error = TypedValue;
-
-    fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
-        if let Some(v) = v.value {
-            if let Value::RangeValue(v) = v {
-                Ok(Some(v))
-            } else {
-                Err(v.into())
-            }
-        } else {
-            Ok(None)
-        }
-    }
-}
-
 macro_rules! impl_range_bound {
     ($rust_type:ty, $value_type:path) => {
         impl From<$rust_type> for range_bound::Value {
@@ -170,7 +136,7 @@ where
     }
 }
 
-pub fn range_value<T>(r: impl RangeBounds<T>) -> RangeValue
+pub fn range_bounds<T>(r: impl RangeBounds<T>) -> RangeValue
 where
     T: Clone + Into<range_bound::Value>,
 {

@@ -16,12 +16,6 @@ use std::collections::{BTreeSet, HashSet};
 
 use crate::v1::*;
 
-impl From<SetValue> for Value {
-    fn from(v: SetValue) -> Self {
-        Self::SetValue(v)
-    }
-}
-
 impl<T: Into<ListValue>> From<T> for SetValue {
     fn from(v: T) -> Self {
         Self {
@@ -92,13 +86,13 @@ macro_rules! impl_set {
     };
 }
 
-macro_rules! impl_sets {
+macro_rules! impl_set_type {
     ($value_type:ty) => {
         impl_set!(HashSet<$value_type>, $value_type);
         impl_set!(BTreeSet<$value_type>, $value_type);
     };
 }
 
-impl_sets!(i64);
-impl_sets!(Vec<u8>);
-impl_sets!(String);
+impl_set_type!(i64);
+impl_set_type!(Vec<u8>);
+impl_set_type!(String);

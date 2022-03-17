@@ -17,8 +17,7 @@
 tonic::include_proto!("engula.v1");
 
 mod blob;
-mod f64;
-mod i64;
+mod bool;
 mod list;
 mod map;
 mod range;
@@ -26,6 +25,7 @@ mod set;
 mod text;
 mod typed_expr;
 pub mod v1;
+mod value;
 
 use std::collections::HashMap;
 

@@ -16,12 +16,6 @@ use std::collections::{BTreeMap, HashMap};
 
 use crate::v1::*;
 
-impl From<MapValue> for Value {
-    fn from(v: MapValue) -> Self {
-        Self::MapValue(v)
-    }
-}
-
 impl<K, V> From<(K, V)> for MapValue
 where
     K: Into<ListValue>,
@@ -123,7 +117,7 @@ macro_rules! impl_map {
     };
 }
 
-macro_rules! impl_maps {
+macro_rules! impl_map_type {
     ($key_type:ty, $value_type:ty) => {
         impl_map!(HashMap<$key_type, $value_type>, $key_type, $value_type);
         impl_map!(BTreeMap<$key_type, $value_type>, $key_type, $value_type);
@@ -136,15 +130,15 @@ macro_rules! impl_maps {
     }
 }
 
-impl_maps!(i64, i64);
-impl_maps!(i64, bool);
-impl_maps!(i64, Vec<u8>);
-impl_maps!(i64, String);
-impl_maps!(Vec<u8>, i64);
-impl_maps!(Vec<u8>, bool);
-impl_maps!(Vec<u8>, Vec<u8>);
-impl_maps!(Vec<u8>, String);
-impl_maps!(String, i64);
-impl_maps!(String, bool);
-impl_maps!(String, Vec<u8>);
-impl_maps!(String, String);
+impl_map_type!(i64, i64);
+impl_map_type!(i64, bool);
+impl_map_type!(i64, Vec<u8>);
+impl_map_type!(i64, String);
+impl_map_type!(Vec<u8>, i64);
+impl_map_type!(Vec<u8>, bool);
+impl_map_type!(Vec<u8>, Vec<u8>);
+impl_map_type!(Vec<u8>, String);
+impl_map_type!(String, i64);
+impl_map_type!(String, bool);
+impl_map_type!(String, Vec<u8>);
+impl_map_type!(String, String);

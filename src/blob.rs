@@ -20,48 +20,14 @@ impl From<&[u8]> for Value {
     }
 }
 
-impl<const N: usize> From<&'_ [u8; N]> for Value {
-    fn from(v: &'_ [u8; N]) -> Self {
-        v.as_slice().into()
-    }
-}
-
 impl<const N: usize> From<[u8; N]> for Value {
     fn from(v: [u8; N]) -> Self {
         Vec::from(v).into()
     }
 }
 
-impl From<Vec<u8>> for Value {
-    fn from(v: Vec<u8>) -> Self {
-        Self::BlobValue(v)
-    }
-}
-
-impl TryFrom<TypedValue> for Vec<u8> {
-    type Error = TypedValue;
-
-    fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
-        if let Some(Value::BlobValue(v)) = v.value {
-            Ok(v)
-        } else {
-            Err(v)
-        }
-    }
-}
-
-impl TryFrom<TypedValue> for Option<Vec<u8>> {
-    type Error = TypedValue;
-
-    fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
-        if let Some(v) = v.value {
-            if let Value::BlobValue(v) = v {
-                Ok(Some(v))
-            } else {
-                Err(v.into())
-            }
-        } else {
-            Ok(None)
-        }
+impl<const N: usize> From<&'_ [u8; N]> for Value {
+    fn from(v: &'_ [u8; N]) -> Self {
+        v.as_slice().into()
     }
 }

@@ -19,37 +19,3 @@ impl From<&str> for Value {
         Value::TextValue(v.to_owned())
     }
 }
-
-impl From<String> for Value {
-    fn from(v: String) -> Self {
-        Value::TextValue(v)
-    }
-}
-
-impl TryFrom<TypedValue> for String {
-    type Error = TypedValue;
-
-    fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
-        if let Some(Value::TextValue(v)) = v.value {
-            Ok(v)
-        } else {
-            Err(v)
-        }
-    }
-}
-
-impl TryFrom<TypedValue> for Option<String> {
-    type Error = TypedValue;
-
-    fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
-        if let Some(v) = v.value {
-            if let Value::TextValue(v) = v {
-                Ok(Some(v))
-            } else {
-                Err(v.into())
-            }
-        } else {
-            Ok(None)
-        }
-    }
-}

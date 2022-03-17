@@ -16,53 +16,7 @@
 
 tonic::include_proto!("engula.v1alpha");
 
-pub use crate::range::range_value;
+pub use crate::range::range_bounds;
 
 pub type Expr = typed_expr::Expr;
 pub type Value = typed_value::Value;
-
-impl From<TypedValue> for () {
-    fn from(_: TypedValue) -> Self {
-        ()
-    }
-}
-
-impl From<()> for TypedValue {
-    fn from(_: ()) -> Self {
-        Self::default()
-    }
-}
-
-impl From<bool> for TypedValue {
-    fn from(v: bool) -> Self {
-        if v { Some(Value::I64Value(1)) } else { None }.into()
-    }
-}
-
-impl From<TypedValue> for bool {
-    fn from(v: TypedValue) -> Self {
-        v.value.is_some()
-    }
-}
-
-impl From<TypedValue> for Option<Value> {
-    fn from(v: TypedValue) -> Self {
-        v.value
-    }
-}
-
-impl<T: Into<Value>> From<T> for TypedValue {
-    fn from(v: T) -> Self {
-        Self {
-            value: Some(v.into()),
-        }
-    }
-}
-
-impl<T: Into<Value>> From<Option<T>> for TypedValue {
-    fn from(v: Option<T>) -> Self {
-        Self {
-            value: v.map(|v| v.into()),
-        }
-    }
-}
