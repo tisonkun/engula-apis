@@ -68,8 +68,6 @@ enum Function {
   CONTAINS = 46;
 }
 
-message AnyExpr { CallExpr call = 1; }
-
 message I64Expr { CallExpr call = 1; }
 
 message F64Expr { CallExpr call = 1; }
@@ -78,11 +76,13 @@ message BlobExpr { CallExpr call = 1; }
 
 message TextExpr { CallExpr call = 1; }
 
+message ListExpr { CallExpr call = 1; }
+
 message MapExpr { CallExpr call = 1; }
 
 message SetExpr { CallExpr call = 1; }
 
-message ListExpr { CallExpr call = 1; }
+message AnyExpr { CallExpr call = 1; }
 
 message CallExpr {
   Function func = 1;
@@ -91,14 +91,14 @@ message CallExpr {
 
 message TypedExpr {
   oneof expr {
-    AnyExpr any_expr = 1;
-    I64Expr i64_expr = 2;
-    F64Expr f64_expr = 3;
-    BlobExpr blob_expr = 4;
-    TextExpr text_expr = 5;
-    MapExpr map_expr = 8;
-    SetExpr set_expr = 9;
-    ListExpr list_expr = 10;
+    I64Expr i64_expr = 1;
+    F64Expr f64_expr = 2;
+    BlobExpr blob_expr = 3;
+    TextExpr text_expr = 4;
+    ListExpr list_expr = 5;
+    MapExpr map_expr = 6;
+    SetExpr set_expr = 7;
+    AnyExpr any_expr = 15;
   }
 }
 
@@ -108,9 +108,9 @@ message TypedValue {
     double f64_value = 2;
     bytes blob_value = 3;
     string text_value = 4;
-    MapValue map_value = 8;
-    SetValue set_value = 9;
-    ListValue list_value = 10;
+    ListValue list_value = 5;
+    MapValue map_value = 6;
+    SetValue set_value = 7;
     RangeValue range_value = 15;
   }
 }

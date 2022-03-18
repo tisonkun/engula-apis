@@ -66,34 +66,20 @@ macro_rules! impl_map {
             type Error = MapValue;
 
             fn try_from(v: MapValue) -> Result<Self, Self::Error> {
-                match (v.keys, v.values) {
-                    (Some(keys), Some(values)) => {
-                        let keys: Result<Vec<$key_type>, _> = keys.try_into();
-                        let values: Result<Vec<$value_type>, _> = values.try_into();
-                        match (keys, values) {
-                            (Ok(keys), Ok(values)) => {
-                                if keys.len() == values.len() {
-                                    Ok(keys.into_iter().zip(values.into_iter()).collect())
-                                } else {
-                                    Err((keys, values).into())
-                                }
-                            }
-                            (Ok(keys), Err(values)) => Err((keys, values).into()),
-                            (Err(keys), Ok(values)) => Err((keys, values).into()),
-                            (Err(keys), Err(values)) => Err((keys, values).into()),
+                let (keys, values) = v.try_into()?;
+                let keys: Result<Vec<$key_type>, _> = keys.try_into();
+                let values: Result<Vec<$value_type>, _> = values.try_into();
+                match (keys, values) {
+                    (Ok(keys), Ok(values)) => {
+                        if keys.len() == values.len() {
+                            Ok(keys.into_iter().zip(values.into_iter()).collect())
+                        } else {
+                            Err((keys, values).into())
                         }
                     }
-                    (Some(keys), None) => Err(MapValue {
-                        keys: Some(keys),
-                        values: None,
-                    }
-                    .into()),
-                    (None, Some(values)) => Err(MapValue {
-                        keys: None,
-                        values: Some(values),
-                    }
-                    .into()),
-                    (None, None) => Err(MapValue::default().into()),
+                    (Ok(keys), Err(values)) => Err((keys, values).into()),
+                    (Err(keys), Ok(values)) => Err((keys, values).into()),
+                    (Err(keys), Err(values)) => Err((keys, values).into()),
                 }
             }
         }
@@ -103,7 +89,7 @@ macro_rules! impl_map {
 
             fn try_from(v: Value) -> Result<Self, Self::Error> {
                 if let Value::MapValue(v) = v {
-                    v.try_into().map_err(|v: MapValue| v.into())
+                    v.try_into().map_err(|v| Value::from(v))
                 } else {
                     Err(v)
                 }
@@ -115,7 +101,7 @@ macro_rules! impl_map {
 
             fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
                 if let Some(v) = v.value {
-                    v.try_into().map_err(|v: Value| v.into())
+                    v.try_into().map_err(|v| TypedValue::from(v))
                 } else {
                     Err(v)
                 }
@@ -127,7 +113,7 @@ macro_rules! impl_map {
 
             fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
                 if let Some(v) = v.value {
-                    v.try_into().map(Some).map_err(|v: Value| v.into())
+                    v.try_into().map(Some).map_err(|v| TypedValue::from(v))
                 } else {
                     Ok(None)
                 }

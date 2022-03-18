@@ -97,7 +97,7 @@ impl_type!(i64, Value::I64Value);
 impl_type!(f64, Value::F64Value);
 impl_type!(Vec<u8>, Value::BlobValue);
 impl_type!(String, Value::TextValue);
+impl_type!(ListValue, Value::ListValue);
 impl_type!(MapValue, Value::MapValue);
 impl_type!(SetValue, Value::SetValue);
-impl_type!(ListValue, Value::ListValue);
 impl_type!(RangeValue, Value::RangeValue);

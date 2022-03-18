@@ -29,4 +29,4 @@ tonic::include_proto!("engula.v1");
 pub type Expr = typed_expr::Expr;
 pub type Value = typed_value::Value;
 
-pub use self::range::range_bounds;
+pub use self::range::{range_bounds, BoundValue};

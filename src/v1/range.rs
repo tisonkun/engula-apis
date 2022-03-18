@@ -16,18 +16,20 @@ use std::ops::{Bound, RangeBounds};
 
 use crate::v1::*;
 
-macro_rules! impl_range_bound {
+pub type BoundValue = range_bound::Value;
+
+macro_rules! impl_bound {
     ($rust_type:ty, $value_type:path) => {
-        impl From<$rust_type> for range_bound::Value {
+        impl From<$rust_type> for BoundValue {
             fn from(v: $rust_type) -> Self {
                 $value_type(v)
             }
         }
 
-        impl TryFrom<range_bound::Value> for $rust_type {
-            type Error = range_bound::Value;
+        impl TryFrom<BoundValue> for $rust_type {
+            type Error = BoundValue;
 
-            fn try_from(v: range_bound::Value) -> Result<Self, Self::Error> {
+            fn try_from(v: BoundValue) -> Result<Self, Self::Error> {
                 if let $value_type(v) = v {
                     Ok(v)
                 } else {
@@ -38,12 +40,12 @@ macro_rules! impl_range_bound {
     };
 }
 
-impl_range_bound!(i64, range_bound::Value::I64Value);
-impl_range_bound!(f64, range_bound::Value::F64Value);
-impl_range_bound!(Vec<u8>, range_bound::Value::BlobValue);
-impl_range_bound!(String, range_bound::Value::TextValue);
+impl_bound!(i64, BoundValue::I64Value);
+impl_bound!(f64, BoundValue::F64Value);
+impl_bound!(Vec<u8>, BoundValue::BlobValue);
+impl_bound!(String, BoundValue::TextValue);
 
-impl<T: Into<range_bound::Value>> From<Bound<T>> for RangeBound {
+impl<T: Into<BoundValue>> From<Bound<T>> for RangeBound {
     fn from(v: Bound<T>) -> Self {
         match v {
             Bound::Included(v) => Self {
@@ -61,7 +63,7 @@ impl<T: Into<range_bound::Value>> From<Bound<T>> for RangeBound {
 
 impl<T> TryFrom<RangeBound> for Bound<T>
 where
-    T: TryFrom<range_bound::Value, Error = range_bound::Value>,
+    T: TryFrom<BoundValue, Error = BoundValue>,
 {
     type Error = RangeBound;
 
@@ -138,7 +140,7 @@ where
 
 pub fn range_bounds<T>(r: impl RangeBounds<T>) -> RangeValue
 where
-    T: Clone + Into<range_bound::Value>,
+    T: Clone + Into<BoundValue>,
 {
     (r.start_bound().cloned(), r.end_bound().cloned()).into()
 }

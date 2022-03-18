@@ -22,12 +22,6 @@ impl<T: Into<Expr>> From<T> for TypedExpr {
     }
 }
 
-impl From<AnyExpr> for Expr {
-    fn from(expr: AnyExpr) -> Self {
-        Expr::AnyExpr(expr)
-    }
-}
-
 impl From<I64Expr> for Expr {
     fn from(expr: I64Expr) -> Self {
         Expr::I64Expr(expr)
@@ -52,6 +46,12 @@ impl From<TextExpr> for Expr {
     }
 }
 
+impl From<ListExpr> for Expr {
+    fn from(expr: ListExpr) -> Self {
+        Expr::ListExpr(expr)
+    }
+}
+
 impl From<MapExpr> for Expr {
     fn from(expr: MapExpr) -> Self {
         Expr::MapExpr(expr)
@@ -64,8 +64,8 @@ impl From<SetExpr> for Expr {
     }
 }
 
-impl From<ListExpr> for Expr {
-    fn from(expr: ListExpr) -> Self {
-        Expr::ListExpr(expr)
+impl From<AnyExpr> for Expr {
+    fn from(expr: AnyExpr) -> Self {
+        Expr::AnyExpr(expr)
     }
 }

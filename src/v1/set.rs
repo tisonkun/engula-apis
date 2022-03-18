@@ -38,7 +38,7 @@ macro_rules! impl_set {
 
             fn try_from(v: SetValue) -> Result<Self, Self::Error> {
                 if let Some(keys) = v.keys {
-                    keys.try_into().map_err(|v: ListValue| v.into())
+                    keys.try_into().map_err(|v| SetValue::from(v))
                 } else {
                     Err(v)
                 }
@@ -59,7 +59,7 @@ macro_rules! impl_set {
 
             fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
                 if let Some(Value::SetValue(v)) = v.value {
-                    v.try_into().map_err(|v| Value::SetValue(v).into())
+                    v.try_into().map_err(|v| TypedValue::from(v))
                 } else {
                     Err(v)
                 }
@@ -72,9 +72,7 @@ macro_rules! impl_set {
             fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
                 if let Some(v) = v.value {
                     if let Value::SetValue(v) = v {
-                        v.try_into()
-                            .map(Some)
-                            .map_err(|v| Value::SetValue(v).into())
+                        v.try_into().map(Some).map_err(|v| TypedValue::from(v))
                     } else {
                         Err(v.into())
                     }
