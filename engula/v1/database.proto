@@ -16,131 +16,79 @@ syntax = "proto3";
 
 package engula.v1;
 
+import "engula/v1/value.proto";
+
 message DatabaseRequest {
   string name = 1;
-  repeated CollectionRequest selects = 2;
-  repeated CollectionRequest mutates = 3;
+  repeated CollectionRequest requests = 2;
 }
 
-message DatabaseResponse {
-  repeated CollectionResponse selects = 1;
-  repeated CollectionResponse mutates = 2;
-}
+message DatabaseResponse { repeated CollectionResponse responses = 1; }
 
 message CollectionRequest {
   string name = 1;
-  repeated bytes ids = 2;
-  repeated TypedExpr exprs = 3;
+  repeated ObjectExpr exprs = 2;
 }
 
-message CollectionResponse { repeated TypedValue values = 1; }
+message CollectionResponse { repeated ObjectResult results = 1; }
 
-// TODO:
-// - Options: TTL
-// - Range expressions
-// - Conditional expressions
+message RangeExpr {}
 
-enum Function {
+message ObjectExpr {
+  // One of batch or range.
+  repeated bytes batch = 1;
+  // RangeExpr range = 2;
+  // FilterExpr filter = 3;
+  // One of select or mutate.
+  SelectExpr select = 4;
+  MutateExpr mutate = 5;
+}
+
+message ObjectResult {
+  // ObjectError error = 1;
+  repeated Value values = 2;
+}
+
+message FilterExpr {}
+
+message SelectExpr {
+  SelectFunction func = 1;
+  repeated Value args = 2;
+  Value index = 3;
+}
+
+message MutateExpr {
+  MutateFunction func = 1;
+  repeated Value args = 2;
+  Value index = 3;
+  // TODO: conditional expression
+}
+
+enum SelectFunction {
   // General
   GET = 0;
-  SET = 1;
-  DELETE = 2;
-  EXISTS = 3;
+
+  // Container
+  LEN = 10;
+}
+
+enum MutateFunction {
+  // General
+  SET = 0;
+  DELETE = 1;
 
   // Numeric
   ADD = 10;
-  SUB = 11;
 
   // Sequence
-  TRIM = 30;
-  LPOP = 31;
-  RPOP = 32;
-  LPUSH = 33;
-  RPUSH = 34;
+  TRIM = 20;
+  LPOP = 21;
+  RPOP = 22;
+  LPUSH = 23;
+  RPUSH = 24;
 
   // Container
-  LEN = 40;
-  INDEX = 41;
-  RANGE = 42;
-  CLEAR = 43;
-  EXTEND = 44;
-  REMOVE = 45;
-  CONTAINS = 46;
-}
-
-message I64Expr { CallExpr call = 1; }
-
-message F64Expr { CallExpr call = 1; }
-
-message BlobExpr { CallExpr call = 1; }
-
-message TextExpr { CallExpr call = 1; }
-
-message ListExpr { CallExpr call = 1; }
-
-message MapExpr { CallExpr call = 1; }
-
-message SetExpr { CallExpr call = 1; }
-
-message AnyExpr { CallExpr call = 1; }
-
-message CallExpr {
-  Function func = 1;
-  repeated TypedValue args = 2;
-}
-
-message TypedExpr {
-  oneof expr {
-    I64Expr i64_expr = 1;
-    F64Expr f64_expr = 2;
-    BlobExpr blob_expr = 3;
-    TextExpr text_expr = 4;
-    ListExpr list_expr = 5;
-    MapExpr map_expr = 6;
-    SetExpr set_expr = 7;
-    AnyExpr any_expr = 15;
-  }
-}
-
-message TypedValue {
-  oneof value {
-    sint64 i64_value = 1;
-    double f64_value = 2;
-    bytes blob_value = 3;
-    string text_value = 4;
-    ListValue list_value = 5;
-    MapValue map_value = 6;
-    SetValue set_value = 7;
-    RangeValue range_value = 15;
-  }
-}
-
-message MapValue {
-  ListValue keys = 1;
-  ListValue values = 2;
-}
-
-message SetValue { ListValue keys = 1; }
-
-message ListValue {
-  repeated sint64 i64_value = 1;
-  repeated double f64_value = 2;
-  repeated bytes blob_value = 3;
-  repeated string text_value = 4;
-}
-
-message RangeBound {
-  oneof value {
-    sint64 i64_value = 1;
-    double f64_value = 2;
-    bytes blob_value = 3;
-    string text_value = 4;
-  }
-
-  bool included = 15;
-}
-
-message RangeValue {
-  RangeBound start = 1;
-  RangeBound end = 2;
+  CLEAR = 30;
+  EXTEND = 31;
+  REMOVE = 32;
 }

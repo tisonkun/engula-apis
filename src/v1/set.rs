@@ -33,6 +33,12 @@ macro_rules! impl_set {
             }
         }
 
+        impl From<$set_type> for value::Value {
+            fn from(set: $set_type) -> Self {
+                SetValue::from(set).into()
+            }
+        }
+
         impl TryFrom<SetValue> for $set_type {
             type Error = SetValue;
 
@@ -54,28 +60,36 @@ macro_rules! impl_set {
             }
         }
 
-        impl TryFrom<TypedValue> for $set_type {
-            type Error = TypedValue;
+        impl TryFrom<value::Value> for $set_type {
+            type Error = value::Value;
 
-            fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
-                if let Some(Value::SetValue(v)) = v.value {
-                    v.try_into().map_err(|v| TypedValue::from(v))
+            fn try_from(v: value::Value) -> Result<Self, Self::Error> {
+                if let value::Value::SetValue(v) = v {
+                    v.try_into().map_err(|v| value::Value::from(v))
                 } else {
                     Err(v)
                 }
             }
         }
 
-        impl TryFrom<TypedValue> for Option<$set_type> {
-            type Error = TypedValue;
+        impl TryFrom<Value> for $set_type {
+            type Error = Value;
 
-            fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
+            fn try_from(v: Value) -> Result<Self, Self::Error> {
                 if let Some(v) = v.value {
-                    if let Value::SetValue(v) = v {
-                        v.try_into().map(Some).map_err(|v| TypedValue::from(v))
-                    } else {
-                        Err(v.into())
-                    }
+                    v.try_into().map_err(|v| Value::from(v))
+                } else {
+                    Err(v)
+                }
+            }
+        }
+
+        impl TryFrom<Value> for Option<$set_type> {
+            type Error = Value;
+
+            fn try_from(v: Value) -> Result<Self, Self::Error> {
+                if let Some(v) = v.value {
+                    v.try_into().map(Some).map_err(|v| Value::from(v))
                 } else {
                     Ok(None)
                 }
@@ -84,13 +98,13 @@ macro_rules! impl_set {
     };
 }
 
-macro_rules! impl_set_type {
+macro_rules! impl_type {
     ($value_type:ty) => {
         impl_set!(HashSet<$value_type>, $value_type);
         impl_set!(BTreeSet<$value_type>, $value_type);
     };
 }
 
-impl_set_type!(i64);
-impl_set_type!(Vec<u8>);
-impl_set_type!(String);
+impl_type!(i64);
+impl_type!(Vec<u8>);
+impl_type!(String);

@@ -12,135 +12,207 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::ops::{Bound, RangeBounds};
+use std::ops::{
+    Bound, Range, RangeBounds, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive,
+};
 
 use crate::v1::*;
 
-pub type BoundValue = range_bound::Value;
+impl RangeValue {
+    pub fn from_bounds<T>(range: impl RangeBounds<T>) -> Self
+    where
+        T: Clone,
+        (Bound<T>, Bound<T>): Into<RangeValue>,
+    {
+        (range.start_bound().cloned(), range.end_bound().cloned())
+            .into()
+            .into()
+    }
+}
 
-macro_rules! impl_bound {
-    ($rust_type:ty, $value_type:path) => {
-        impl From<$rust_type> for BoundValue {
+impl From<RangeFull> for RangeValue {
+    fn from(_: RangeFull) -> Self {
+        Self::default()
+    }
+}
+
+macro_rules! impl_type {
+    ($rust_type:ty, $range_type:path) => {
+        impl From<$rust_type> for range_bound::Value {
             fn from(v: $rust_type) -> Self {
-                $value_type(v)
+                $range_type(v)
             }
         }
 
-        impl TryFrom<BoundValue> for $rust_type {
-            type Error = BoundValue;
+        impl TryFrom<range_bound::Value> for $rust_type {
+            type Error = range_bound::Value;
 
-            fn try_from(v: BoundValue) -> Result<Self, Self::Error> {
-                if let $value_type(v) = v {
+            fn try_from(v: range_bound::Value) -> Result<Self, Self::Error> {
+                if let $range_type(v) = v {
                     Ok(v)
                 } else {
                     Err(v)
                 }
             }
         }
+
+        impl From<Bound<$rust_type>> for RangeBound {
+            fn from(v: Bound<$rust_type>) -> Self {
+                match v {
+                    Bound::Included(v) => Self {
+                        value: Some(v.into()),
+                        included: true,
+                    },
+                    Bound::Excluded(v) => Self {
+                        value: Some(v.into()),
+                        included: false,
+                    },
+                    Bound::Unbounded => Self::default(),
+                }
+            }
+        }
+
+        impl TryFrom<RangeBound> for Bound<$rust_type> {
+            type Error = RangeBound;
+
+            fn try_from(b: RangeBound) -> Result<Self, Self::Error> {
+                match b.value {
+                    Some($range_type(v)) => {
+                        if b.included {
+                            Ok(Bound::Included(v))
+                        } else {
+                            Ok(Bound::Excluded(v))
+                        }
+                    }
+                    None => Ok(Bound::Unbounded),
+                    _ => Err(b),
+                }
+            }
+        }
+
+        impl From<Range<$rust_type>> for RangeValue {
+            fn from(r: Range<$rust_type>) -> Self {
+                (Bound::Included(r.start), Bound::Excluded(r.end)).into()
+            }
+        }
+
+        impl From<Range<$rust_type>> for value::Value {
+            fn from(r: Range<$rust_type>) -> Self {
+                RangeValue::from(r).into()
+            }
+        }
+
+        impl From<RangeFrom<$rust_type>> for RangeValue {
+            fn from(r: RangeFrom<$rust_type>) -> Self {
+                (Bound::Included(r.start), Bound::Unbounded).into()
+            }
+        }
+
+        impl From<RangeFrom<$rust_type>> for value::Value {
+            fn from(r: RangeFrom<$rust_type>) -> Self {
+                RangeValue::from(r).into()
+            }
+        }
+
+        impl From<RangeInclusive<$rust_type>> for RangeValue {
+            fn from(r: RangeInclusive<$rust_type>) -> Self {
+                (
+                    Bound::Included(r.start().clone()),
+                    Bound::Included(r.end().clone()),
+                )
+                    .into()
+            }
+        }
+
+        impl From<RangeInclusive<$rust_type>> for value::Value {
+            fn from(r: RangeInclusive<$rust_type>) -> Self {
+                RangeValue::from(r).into()
+            }
+        }
+
+        impl From<RangeTo<$rust_type>> for RangeValue {
+            fn from(r: RangeTo<$rust_type>) -> Self {
+                (Bound::Unbounded, Bound::Excluded(r.end)).into()
+            }
+        }
+
+        impl From<RangeTo<$rust_type>> for value::Value {
+            fn from(r: RangeTo<$rust_type>) -> Self {
+                RangeValue::from(r).into()
+            }
+        }
+
+        impl From<RangeToInclusive<$rust_type>> for RangeValue {
+            fn from(r: RangeToInclusive<$rust_type>) -> Self {
+                (Bound::Unbounded, Bound::Included(r.end)).into()
+            }
+        }
+
+        impl From<RangeToInclusive<$rust_type>> for value::Value {
+            fn from(r: RangeToInclusive<$rust_type>) -> Self {
+                RangeValue::from(r).into()
+            }
+        }
+
+        impl From<(Bound<$rust_type>, Bound<$rust_type>)> for RangeValue {
+            fn from(r: (Bound<$rust_type>, Bound<$rust_type>)) -> Self {
+                Self {
+                    start: Some(r.0.into()),
+                    end: Some(r.1.into()),
+                }
+            }
+        }
+
+        impl From<(Bound<$rust_type>, Bound<$rust_type>)> for value::Value {
+            fn from(r: (Bound<$rust_type>, Bound<$rust_type>)) -> Self {
+                RangeValue::from(r).into()
+            }
+        }
+
+        impl TryFrom<RangeValue> for (Bound<$rust_type>, Bound<$rust_type>) {
+            type Error = ();
+
+            fn try_from(r: RangeValue) -> Result<Self, Self::Error> {
+                let start = if let Some(v) = r.start {
+                    v.try_into().map_err(|_| ())?
+                } else {
+                    Bound::Unbounded
+                };
+                let end = if let Some(v) = r.end {
+                    v.try_into().map_err(|_| ())?
+                } else {
+                    Bound::Unbounded
+                };
+                Ok((start, end))
+            }
+        }
+
+        impl TryFrom<value::Value> for (Bound<$rust_type>, Bound<$rust_type>) {
+            type Error = ();
+
+            fn try_from(v: value::Value) -> Result<Self, Self::Error> {
+                if let value::Value::RangeValue(v) = v {
+                    v.try_into()
+                } else {
+                    Err(())
+                }
+            }
+        }
+
+        impl TryFrom<Value> for (Bound<$rust_type>, Bound<$rust_type>) {
+            type Error = ();
+
+            fn try_from(v: Value) -> Result<Self, Self::Error> {
+                if let Some(v) = v.value {
+                    v.try_into()
+                } else {
+                    Err(())
+                }
+            }
+        }
     };
 }
 
-impl_bound!(i64, BoundValue::I64Value);
-impl_bound!(f64, BoundValue::F64Value);
-impl_bound!(Vec<u8>, BoundValue::BlobValue);
-impl_bound!(String, BoundValue::TextValue);
-
-impl<T: Into<BoundValue>> From<Bound<T>> for RangeBound {
-    fn from(v: Bound<T>) -> Self {
-        match v {
-            Bound::Included(v) => Self {
-                value: Some(v.into()),
-                included: true,
-            },
-            Bound::Excluded(v) => Self {
-                value: Some(v.into()),
-                included: false,
-            },
-            Bound::Unbounded => Self::default(),
-        }
-    }
-}
-
-impl<T> TryFrom<RangeBound> for Bound<T>
-where
-    T: TryFrom<BoundValue, Error = BoundValue>,
-{
-    type Error = RangeBound;
-
-    fn try_from(v: RangeBound) -> Result<Self, Self::Error> {
-        let included = v.included;
-        if let Some(v) = v.value {
-            if included {
-                match v.try_into() {
-                    Ok(v) => Ok(Bound::Included(v)),
-                    Err(v) => Err(Bound::Included(v).into()),
-                }
-            } else {
-                match v.try_into() {
-                    Ok(v) => Ok(Bound::Excluded(v)),
-                    Err(v) => Err(Bound::Excluded(v).into()),
-                }
-            }
-        } else {
-            Ok(Bound::Unbounded)
-        }
-    }
-}
-
-impl<T: Into<RangeBound>> From<(T, T)> for RangeValue {
-    fn from(v: (T, T)) -> Self {
-        Self {
-            start: Some(v.0.into()),
-            end: Some(v.1.into()),
-        }
-    }
-}
-
-impl<T> TryFrom<RangeValue> for (Bound<T>, Bound<T>)
-where
-    Bound<T>: TryFrom<RangeBound, Error = RangeBound> + Into<RangeBound>,
-{
-    type Error = RangeValue;
-
-    fn try_from(v: RangeValue) -> Result<Self, Self::Error> {
-        match (v.start, v.end) {
-            (Some(start), Some(end)) => match (start.try_into(), end.try_into()) {
-                (Ok(start), Ok(end)) => Ok((start, end)),
-                (Ok(start), Err(end)) => Err((start.into(), end).into()),
-                (Err(start), Ok(end)) => Err((start, end.into()).into()),
-                (Err(start), Err(end)) => Err((start, end).into()),
-            },
-            (Some(start), None) => match start.try_into() {
-                Ok(start) => Ok((start, Bound::Unbounded)),
-                Err(start) => Err((start, RangeBound::default()).into()),
-            },
-            (None, Some(end)) => match end.try_into() {
-                Ok(end) => Ok((Bound::Unbounded, end)),
-                Err(end) => Err((RangeBound::default(), end).into()),
-            },
-            (None, None) => Ok((Bound::Unbounded, Bound::Unbounded)),
-        }
-    }
-}
-
-impl<T> TryFrom<TypedValue> for (Bound<T>, Bound<T>)
-where
-    (Bound<T>, Bound<T>): TryFrom<RangeValue, Error = RangeValue>,
-{
-    type Error = TypedValue;
-
-    fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
-        if let Some(Value::RangeValue(v)) = v.value {
-            v.try_into().map_err(|v: RangeValue| v.into())
-        } else {
-            Err(v)
-        }
-    }
-}
-
-pub fn range_bounds<T>(r: impl RangeBounds<T>) -> RangeValue
-where
-    T: Clone + Into<BoundValue>,
-{
-    (r.start_bound().cloned(), r.end_bound().cloned()).into()
-}
+impl_type!(i64, range_bound::Value::I64Value);
+impl_type!(Vec<u8>, range_bound::Value::BlobValue);
+impl_type!(String, range_bound::Value::TextValue);

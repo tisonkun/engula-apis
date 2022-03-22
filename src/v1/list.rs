@@ -16,11 +16,32 @@ use prost::Message;
 
 use crate::v1::*;
 
-macro_rules! impl_list_type {
+macro_rules! impl_type {
     ($rust_type:ty, $list_value:ident) => {
+        impl From<Vec<$rust_type>> for ListValue {
+            fn from(v: Vec<$rust_type>) -> Self {
+                Self {
+                    $list_value: v,
+                    ..Default::default()
+                }
+            }
+        }
+
+        impl From<Vec<$rust_type>> for value::Value {
+            fn from(v: Vec<$rust_type>) -> Self {
+                ListValue::from(v).into()
+            }
+        }
+
         impl From<&'_ [$rust_type]> for ListValue {
             fn from(v: &'_ [$rust_type]) -> Self {
                 Vec::from(v).into()
+            }
+        }
+
+        impl From<&'_ [$rust_type]> for value::Value {
+            fn from(v: &'_ [$rust_type]) -> Self {
+                ListValue::from(v).into()
             }
         }
 
@@ -30,18 +51,21 @@ macro_rules! impl_list_type {
             }
         }
 
+        impl<const N: usize> From<[$rust_type; N]> for value::Value {
+            fn from(v: [$rust_type; N]) -> Self {
+                ListValue::from(v).into()
+            }
+        }
+
         impl<const N: usize> From<&'_ [$rust_type; N]> for ListValue {
             fn from(v: &'_ [$rust_type; N]) -> Self {
                 v.as_slice().into()
             }
         }
 
-        impl From<Vec<$rust_type>> for ListValue {
-            fn from(v: Vec<$rust_type>) -> Self {
-                Self {
-                    $list_value: v,
-                    ..Default::default()
-                }
+        impl<const N: usize> From<&'_ [$rust_type; N]> for value::Value {
+            fn from(v: &'_ [$rust_type; N]) -> Self {
+                ListValue::from(v).into()
             }
         }
 
@@ -57,9 +81,15 @@ macro_rules! impl_list_type {
             }
         }
 
-        impl From<Vec<$rust_type>> for Value {
-            fn from(v: Vec<$rust_type>) -> Self {
-                Self::ListValue(v.into())
+        impl TryFrom<value::Value> for Vec<$rust_type> {
+            type Error = value::Value;
+
+            fn try_from(v: value::Value) -> Result<Self, Self::Error> {
+                if let value::Value::ListValue(v) = v {
+                    v.try_into().map_err(|v| value::Value::from(v))
+                } else {
+                    Err(v)
+                }
             }
         }
 
@@ -67,7 +97,7 @@ macro_rules! impl_list_type {
             type Error = Value;
 
             fn try_from(v: Value) -> Result<Self, Self::Error> {
-                if let Value::ListValue(v) = v {
+                if let Some(v) = v.value {
                     v.try_into().map_err(|v| Value::from(v))
                 } else {
                     Err(v)
@@ -75,28 +105,12 @@ macro_rules! impl_list_type {
             }
         }
 
-        impl TryFrom<TypedValue> for Vec<$rust_type> {
-            type Error = TypedValue;
+        impl TryFrom<Value> for Option<Vec<$rust_type>> {
+            type Error = Value;
 
-            fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
-                if let Some(Value::ListValue(v)) = v.value {
-                    v.try_into().map_err(|v| TypedValue::from(v))
-                } else {
-                    Err(v)
-                }
-            }
-        }
-
-        impl TryFrom<TypedValue> for Option<Vec<$rust_type>> {
-            type Error = TypedValue;
-
-            fn try_from(v: TypedValue) -> Result<Self, Self::Error> {
+            fn try_from(v: Value) -> Result<Self, Self::Error> {
                 if let Some(v) = v.value {
-                    if let Value::ListValue(v) = v {
-                        v.try_into().map(Some).map_err(|v| TypedValue::from(v))
-                    } else {
-                        Err(v.into())
-                    }
+                    v.try_into().map(Some).map_err(|v| Value::from(v))
                 } else {
                     Ok(None)
                 }
@@ -105,7 +119,20 @@ macro_rules! impl_list_type {
     };
 }
 
-impl_list_type!(i64, i64_value);
-impl_list_type!(f64, f64_value);
-impl_list_type!(Vec<u8>, blob_value);
-impl_list_type!(String, text_value);
+impl_type!(i64, i64_value);
+impl_type!(f64, f64_value);
+impl_type!(Vec<u8>, blob_value);
+impl_type!(String, text_value);
+
+impl<const N: usize> From<[i32; N]> for ListValue {
+    fn from(v: [i32; N]) -> Self {
+        let v: Vec<i64> = v.into_iter().map(|v| v as i64).collect();
+        v.into()
+    }
+}
+
+impl<const N: usize> From<[i32; N]> for value::Value {
+    fn from(v: [i32; N]) -> Self {
+        ListValue::from(v).into()
+    }
+}
