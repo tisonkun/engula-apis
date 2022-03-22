@@ -23,11 +23,13 @@ service Engula {
   rpc Batch(BatchRequest) returns (BatchResponse) {}
 }
 
+// A unified request message for the Engula service.
 message BatchRequest {
   repeated DatabaseRequest databases = 1;
   repeated UniverseRequest universes = 2;
 }
 
+// A unified response message for the Engula service.
 message BatchResponse {
   repeated DatabaseResponse databases = 1;
   repeated UniverseResponse universes = 2;

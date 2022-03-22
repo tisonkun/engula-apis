@@ -16,6 +16,7 @@ syntax = "proto3";
 
 package engula.v1;
 
+// A unified request message for databases and collections management.
 message UniverseRequest {
   oneof request {
     ListDatabasesRequest list_databases = 1;
@@ -31,6 +32,7 @@ message UniverseRequest {
   }
 }
 
+// A unified response message for databases and collections management.
 message UniverseResponse {
   oneof response {
     ListDatabasesResponse list_databases = 1;
@@ -47,93 +49,157 @@ message UniverseResponse {
 }
 
 message ListDatabasesRequest {
+  // Maximum number of databaess to return.
+  // The service will use this parameter or 100, whichever is smaller.
   uint64 page_size = 1;
+  // A token returned by a previous response to retrieve the next page.
+  // If this field is omitted, the service will return the first page.
   string page_token = 2;
 }
 
 message ListDatabasesResponse {
+  // A list of database descriptors.
   repeated DatabaseDesc descs = 1;
+  // A token to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
   string next_page_token = 2;
 }
 
 message CreateDatabaseRequest {
+  // Required. The name of the database.
   string name = 1;
+  // Some options for the database.
   DatabaseOptions options = 2;
 }
 
-message CreateDatabaseResponse { DatabaseDesc desc = 1; }
+message CreateDatabaseResponse {
+  // The descriptor of the created database.
+  DatabaseDesc desc = 1;
+}
 
 message UpdateDatabaseRequest {
+  // Required. The name of the database.
   string name = 1;
+  // The new options for the database.
   DatabaseOptions options = 2;
 }
 
-message UpdateDatabaseResponse { DatabaseDesc desc = 1; }
+message UpdateDatabaseResponse {
+  // The descriptor of the updated database.
+  DatabaseDesc desc = 1;
+}
 
-message DeleteDatabaseRequest { string name = 1; }
+message DeleteDatabaseRequest {
+  // Required. The name of the database.
+  string name = 1;
+}
 
 message DeleteDatabaseResponse {}
 
-message DescribeDatabaseRequest { string name = 1; }
+message DescribeDatabaseRequest {
+  // Required. The name of the database.
+  string name = 1;
+}
 
-message DescribeDatabaseResponse { DatabaseDesc desc = 1; }
+message DescribeDatabaseResponse {
+  // The descriptor of the database.
+  DatabaseDesc desc = 1;
+}
 
 message ListCollectionsRequest {
+  // Required. The name of the parent database.
   string name = 1;
+  // Maximum number of collections to return.
+  // The service will use this parameter or 100, whichever is smaller.
   uint64 page_size = 2;
+  // A token returned by a previous response to retrieve the next page.
+  // If this field is omitted, the service will return the first page.
   string page_token = 3;
 }
 
 message ListCollectionsResponse {
+  // A list of collection descriptors.
   repeated CollectionDesc descs = 1;
+  // A token to retrieve the next page.
+  // If this field is omitted, there are no subsequent pages.
   string next_page_token = 2;
 }
 
 message CreateCollectionRequest {
+  // Required. The name of the collection.
   string name = 1;
+  // Required. The name of the parent database.
   string dbname = 2;
+  // Some options for the collection.
   CollectionOptions options = 3;
 }
 
-message CreateCollectionResponse { CollectionDesc desc = 1; }
+message CreateCollectionResponse {
+  // The descriptor of the created collection.
+  CollectionDesc desc = 1;
+}
 
 message UpdateCollectionRequest {
+  // Required. The name of the collection.
   string name = 1;
+  // Required. The name of the parent database.
   string dbname = 2;
+  // The new options for the collection.
   CollectionOptions options = 3;
 }
 
-message UpdateCollectionResponse { CollectionDesc desc = 1; }
+message UpdateCollectionResponse {
+  // The descriptor of the updated collection.
+  CollectionDesc desc = 1;
+}
 
 message DeleteCollectionRequest {
+  // Required. The name of the collection.
   string name = 1;
+  // Required. The name of the parent database.
   string dbname = 2;
 }
 
 message DeleteCollectionResponse {}
 
 message DescribeCollectionRequest {
+  // Required. The name of the collection.
   string name = 1;
+  // Required. The name of the parent database.
   string dbname = 2;
 }
 
-message DescribeCollectionResponse { CollectionDesc desc = 1; }
+message DescribeCollectionResponse {
+  // The descriptor of the collection.
+  CollectionDesc desc = 1;
+}
 
 message DatabaseDesc {
+  // The id of the database unique within the universe.
   uint64 id = 1;
+  // The name of the database unique within the universe.
   string name = 2;
+  // The options of the database.
   DatabaseOptions options = 3;
+  // The properties of the database.
   DatabaseProperties properties = 4;
 }
 
 message DatabaseOptions {}
 
-message DatabaseProperties { uint64 num_collections = 1; }
+message DatabaseProperties {
+  // Number of collections in the database.
+  uint64 num_collections = 1;
+}
 
 message CollectionDesc {
+  // The id of the collection unique within the parent database.
   uint64 id = 1;
+  // The name of the collection unique within the parent database.
   string name = 2;
+  // The options of the collection.
   CollectionOptions options = 3;
+  // The properties of the collection.
   CollectionProperties properties = 4;
 }
 
